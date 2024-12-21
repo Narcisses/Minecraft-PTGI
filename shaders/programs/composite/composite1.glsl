@@ -25,8 +25,7 @@ void main() {
     color = texture(colortex0, texcoord);
 
 	// Compute depth derivative and save it next to position
-	// float depth = texture(depthtex0, texcoord).r;
-	float depth = distance(cameraPosition, texture(colortex1, texcoord).xyz);
+	float depth = texture(depthtex0, texcoord).r;
 	float depthDerivative = max(abs(dFdx(depth)), abs(dFdy(depth)));
 	positionAndDepth = vec4(texture(colortex1, texcoord).xyz, depthDerivative);
 }

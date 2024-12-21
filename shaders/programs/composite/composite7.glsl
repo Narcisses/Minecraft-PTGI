@@ -1,4 +1,6 @@
-#include "/lib/utils.glsl"
+#include "/lib/settings/settings.glsl"
+#include "/lib/settings/uniforms.glsl"
+#include "/lib/settings/buffers.glsl"
 
 #ifdef VSH
 

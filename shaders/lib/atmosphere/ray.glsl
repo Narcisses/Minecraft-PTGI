@@ -4,8 +4,8 @@ vec3 getRayDir(vec2 uv) {
     // Right-handed coordinate system (Z points negative inside scene).
 
     // NDC
-    float x = (2.0f * uv.x) - 1.0;
-    float y = (2.0f * uv.y) - 1.0;
+    float x = (2.0 * uv.x) - 1.0;
+    float y = (2.0 * uv.y) - 1.0;
 
     // Clip
     vec4 rayClip = vec4(vec2(x, y), -1.0, 1.0);
@@ -19,6 +19,16 @@ vec3 getRayDir(vec2 uv) {
     rayWor = normalize(rayWor);
 
     return rayWor;
+}
+
+vec3 getViewDir(vec2 uv) {
+    // Compute ray direction taking into account bob view (bobbing)
+    float depth = texture(depthtex0, uv).r;
+    vec4 fragPos = gbufferProjectionInverse * (vec4(uv, depth, 1.0) * 2.0 - 1.0);
+    fragPos /= fragPos.w;
+    vec3 viewPos = mat3(gbufferModelViewInverse) * fragPos.xyz;
+
+    return normalize(eyeCameraPosition + viewPos);
 }
 
 vec2 reprojectPos(in vec3 pos) {

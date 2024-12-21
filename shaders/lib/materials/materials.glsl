@@ -1,5 +1,17 @@
 bool isEmitter(int blockID) {
-    return blockID == 10146 || blockID == 10265;
+    // Is the block a light emitter
+    return  blockID == 10135 || // glowstone
+            blockID == 10222 || // lit_redstone_lamp
+            blockID == 10178 || // lantern
+            blockID == 10326 || // redstone_lamp
+            blockID == 10334;// || // shroomlight
+            // blockID == 15391 || // redstone_torch
+            // blockID == 15418 || // soul_torch
+            // blockID == 15450 || // torch
+            // blockID == 15465 || // underwater_torch
+            // blockID == 15520 || // wall_torch
+            // blockID == 15521 || // redstone_wall_torch
+            // blockID == 15522; // soul_wall_torch
 }
 
 vec3 getEmission(float blockID, vec3 color) {

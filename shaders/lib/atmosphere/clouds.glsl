@@ -1,29 +1,31 @@
 /* Implementation from https://www.shadertoy.com/view/MdGfzh */
 #define CLOUD_MARCH_STEPS 12
-#define CLOUD_SELF_SHADOW_STEPS 12
+#define CLOUD_SELF_SHADOW_STEPS 4
 
 #define EARTH_RADIUS 1500000.0
-#define CLOUDS_BOTTOM 1350.0
-#define CLOUDS_TOP 2350.0
+#define CLOUDS_BOTTOM 1300.0
+#define CLOUDS_TOP 1400.0
 
-#define CLOUDS_COVERAGE_DRY 0.52
-#define CLOUDS_COVERAGE_WET 0.72
+#define CLOUDS_COVERAGE_DRY 0.50
+#define CLOUDS_COVERAGE_WET 0.83
 
 #define CLOUDS_DETAIL_STRENGTH 0.225
 #define CLOUDS_BASE_EDGE_SOFTNESS 0.1
-#define CLOUDS_BOTTOM_SOFTNESS 0.25
-#define CLOUDS_DENSITY 0.35
-#define CLOUDS_SHADOW_MARGE_STEP_SIZE 10.0
+#define CLOUDS_BOTTOM_SOFTNESS 0.125
+#define CLOUDS_DENSITY_DRY 0.005
+#define CLOUDS_DENSITY_WET 0.05
+#define CLOUDS_DENSITY_NIGHT_BONUS 0.05
+#define CLOUDS_SHADOW_MARGE_STEP_SIZE 15.0
 #define CLOUDS_SHADOW_MARGE_STEP_MULTIPLY 1.3
 #define CLOUDS_FORWARD_SCATTERING_G 0.8
 #define CLOUDS_BACKWARD_SCATTERING_G -0.2
 #define CLOUDS_SCATTERING_LERP 0.5
 
-#define CLOUDS_AMBIENT_COLOR_TOP_DAY vec3(0.87, 0.98, 1.17)
-#define CLOUDS_AMBIENT_COLOR_BOTTOM_DAY vec3(0.22, 0.39, 0.51)
+#define CLOUDS_AMBIENT_COLOR_TOP_DAY vec3(0.9, 0.98, 1.0) * 1.4 // * 0.5
+#define CLOUDS_AMBIENT_COLOR_BOTTOM_DAY vec3(0.75, 0.9, 1.0) * 1.1 // * 0.5
 #define CLOUDS_AMBIENT_COLOR_TOP_NIGHT vec3(0.0039, 0.0196, 0.0353)
 #define CLOUDS_AMBIENT_COLOR_BOTTOM_NIGHT vec3(0.0, 0.0, 0.0)
-#define CLOUDS_MIN_TRANSMITTANCE 0.1
+#define CLOUDS_MIN_TRANSMITTANCE 0.01
 
 #define CLOUDS_BASE_SCALE 1.01
 #define CLOUDS_DETAIL_SCALE 16.0
@@ -103,11 +105,14 @@ float cloudMap(vec3 pos, vec3 rd, float norY) {
     }
 
     float cloudsCoverage = mix(CLOUDS_COVERAGE_DRY, CLOUDS_COVERAGE_WET, wetness);
+    float cloudsDensity = mix(CLOUDS_DENSITY_DRY, CLOUDS_DENSITY_WET, wetness);
+    float amountNight = mix(0.0, CLOUDS_DENSITY_NIGHT_BONUS, getNightAmount());
+    cloudsDensity += amountNight;
 
     m = smoothstep(0., CLOUDS_BASE_EDGE_SOFTNESS, m + (cloudsCoverage - 1.));
     m *= linearstep0(CLOUDS_BOTTOM_SOFTNESS, norY);
 
-    return clamp(m * CLOUDS_DENSITY * (1.0 + max((ps.x - 7000.0) * 0.005, 0.0)), 0.0, 1.0);
+    return clamp(m * cloudsDensity * (1.0 + max((ps.x - 7000.0) * 0.005, 0.0)), 0.0, 1.0);
 }
 
 float volumetricShadow(in vec3 from, in float sundotrd) {
@@ -139,9 +144,9 @@ vec4 renderClouds(vec3 ro, vec3 rd, inout float dist) {
     float start = interectCloudSphere(rd, CLOUDS_BOTTOM);
     float end = interectCloudSphere(rd, CLOUDS_TOP);
 
-    vec3 light_color = getLightCasterColor();
+    vec3 light_color = getLightCasterColor(); //getSkyColor(rd, false, false); //
     float sunAmount = getSunAmount();
-    float cloudClearColorAmount = max(0.0, sunAmount - wetness * 0.33);
+    float cloudClearColorAmount = max(0.0, sunAmount - wetness * 0.5);
 
     end = min(end, dist);
 

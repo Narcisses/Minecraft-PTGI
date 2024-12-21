@@ -77,7 +77,7 @@ uniform float darknessLightFactor;              // lightmap variations caused by
 // For visual effects
 const float wetnessHalflife = 50.0;
 const float drynessHalflife = 50.0;
-const float eyeBrightnessHalflife = 50.0;
+const float eyeBrightnessHalflife = 40.0;
 const float centerDepthHalflife = 1.0;
 const float sunPathRotation = 0.0;
 const float ambientOcclusionLevel = 0.0;
@@ -90,3 +90,4 @@ const int shadowMapResolution = 4096;
 // Custom uniforms
 uniform vec2 iresolution;
 uniform float framemod8;
+uniform float newframemod8;

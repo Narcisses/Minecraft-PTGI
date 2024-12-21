@@ -37,7 +37,9 @@ float getMaxBrightness() {
 float exposure() {
     float expo = (1.0 - (1.0 - getMaxBrightness()) * MAX_EXPOSURE);
     expo *= 1.0 - getSunAmount() * 0.65;
-    return clamp(expo, 0.05, MAX_EXPOSURE);
+    float sunnyExpo = clamp(expo, 0.05, MAX_EXPOSURE);
+    float rainyExpo = 1.0;
+    return mix(sunnyExpo, rainyExpo, wetness);
 }
 
 float luminance(vec3 color) {

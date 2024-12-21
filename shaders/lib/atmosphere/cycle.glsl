@@ -1,6 +1,6 @@
 float getSunAmount() {
 	float sunsetStart = 12000.;
-	float sunsetEnd = 14000.;
+	float sunsetEnd = 13000.;
 
 	float sunriseStart = 22000.;
 	float sunriseEnd = 24000.;
@@ -102,6 +102,26 @@ float getSunRiseSetPercentage() {
 	return t;
 }
 
+float getFastSunsetPercentage() {
+	float preSunset = 12000;
+	float sunset = 13000;
+	float preSunrise = 23000;
+	float sunrise = 24000;
+
+	float t = 0.0;
+
+	if (worldTime >= preSunset && worldTime <= sunset) {
+		t = mapRange(worldTime, preSunset, sunset, 0.0, 1.0);
+	} else if (worldTime >= sunset && worldTime < preSunrise) {
+		t = 1.0;
+	} else if (worldTime >= preSunrise) {
+		t = mapRange(worldTime, preSunrise, sunrise, 0.0, 1.0);
+		t = 1.0 - t;
+	}
+
+	return t;
+}
+
 float getNightAmount() {
     // Return 0.0-1.0 from start night to midnight
     // Return 1.0-0.0 from midnight to end night
@@ -126,21 +146,7 @@ float getFogAmount() {
     // Lots of fog when sunset to hide sky-clouds border
 	// In order to make beautiful blending
 
-	float preSunSetStart = 20000;
-    float preSunSetEnd = 22000;
-    float afterSunSetStart = 0;
-    float afterSunSetEnd = 2000;
-
-	float amount = 0.0;
-
-    // if (worldTime >= preSunSetStart && worldTime < preSunSetEnd) {
-	// 	amount = mapRange(worldTime, preSunSetStart, preSunSetEnd, 0.0, 1.0);
-	// }
-    // else if (worldTime >= afterSunSetStart && worldTime < afterSunSetEnd) {
-	// 	amount = mapRange(worldTime, afterSunSetStart, afterSunSetEnd, 0.0, 1.0);
-	// }
-
-	return amount;
+	return 0.0;
 }
 
 float getBloomAlphaAmount() {
@@ -149,16 +155,16 @@ float getBloomAlphaAmount() {
 	float sunriseEnd = 24000;
 	float sunsetStart = 11500;
 	float sunsetEnd = 13000;
-	float alphalo = 0.01;
-	float alphahi = 0.05;
-	float alpha0 = 0.001;
+	float alphalo = 0.0005;
+	float alphahi = 0.0015;
+	float alpha0 = 0.00005;
 
-	float t = alphahi * 0.80; // 0.40
+	float t = alphahi;
 
 	if (worldTime >= sunriseStart) {
 		t = mapRange(worldTime, sunriseStart, sunriseEnd, alphalo, alphahi);
 	} else if (worldTime >= sunsetStart && worldTime <= sunsetEnd) {
-		t = mapRange(worldTime, sunsetStart, sunsetEnd, alphahi, alpha0);// * 0.45;
+		t = mapRange(worldTime, sunsetStart, sunsetEnd, alphahi, alpha0);
 	} else if (worldTime > sunsetEnd && worldTime < sunriseStart) {
 		t = alpha0;
 	}
@@ -166,19 +172,30 @@ float getBloomAlphaAmount() {
 	return t;
 }
 
+vec3 getSunPosition() {
+	return mat3(gbufferModelViewInverse) * sunPosition;
+}
+
+vec3 getMoonPosition() {
+	return mat3(gbufferModelViewInverse) * moonPosition;
+}
+
 vec3 getSunDir() {
     // Compute sun direction in world space
-    vec3 sunWorldPos = mat3(gbufferModelViewInverse) * sunPosition;
-    return normalize(sunWorldPos);
+    return normalize(getSunPosition());
 }
 
 vec3 getMoonDir() {
     // Compute moon direction in world space
-    vec3 moonWorldPos = mat3(gbufferModelViewInverse) * moonPosition;
-    return normalize(moonWorldPos);
+    return normalize(getMoonPosition());
 }
 
 vec3 getLightCasterDir() {
 	// Return sun color if day else moon color
-	return (getSunAmount() <= 0.05) ? getMoonDir() : getSunDir();
+	if (worldTime > 13000) {
+		getMoonDir();
+	} else {
+		getSunDir();
+	}
+	return getMoonDir();// (getSunAmount() <= 0.01) ? getMoonDir() : getSunDir();
 }

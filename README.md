@@ -35,6 +35,9 @@ This repository presents a shaderpack for Minecraft 1.21 with Iris that implemen
 ## Features
 - Path traced global illumination (PTGI)
 - Spatiotemporal variance guided filtering (SVGF)
+- Temporal Anti-Aliasing (TAA)
+- Temporal reprojection & motion buffers
+- Upscaling
 - Sky
 - Volumetric clouds
 - Day/night cycle
@@ -46,15 +49,13 @@ This repository presents a shaderpack for Minecraft 1.21 with Iris that implemen
 ## TODO
 This shader is not finished but may be of use to anyone who wants to grab parts of the pipeline for their own project or enhance the visuals of this shader.
 
-- Implement TAA
-- Increase framerate (better downscaling / upscaling for PTGI pass)
-- Fix bug when far away from spawn
-- Fix noise on screen sides when moving camera and when little light
+- Better TAA with motion buffers
+- Increase ray tracer performance / efficiency (e.g. MIS)
 
 The shader contains multiple bugs and exhibits weird behavior sometimes especially when there is little light which makes the denoiser go crazy and flicker the pixels.
 
 ## How it works
-The main feature of this shaderpack is path tracing global illumination which computes lighting in a realistic way by tracing rays through the scene and bouncing them until they hit a light source. This shader shows a hybrid renderer based on OpenGL. In order to keep world data around for path tracing I use voxelization by hijacking the shadow pass to compute a voxel map that stores the 3D world blocks into a 2D texture using uniform grids. We can ray trace this texture later in the pipeline at shading time in fullscreen passes.
+The main feature of this shaderpack is path tracing global illumination which computes lighting in a realistic way by tracing rays through the scene and bouncing them until they hit a light source. This shader shows a hybrid renderer based on OpenGL. In order to keep world data around for path tracing I use voxelization by hijacking the shadow pass to compute a voxel map that stores the 3D world blocks into a 2D texture using uniform grids. We can ray trace this texture later in the pipeline at shading time in fullscreen passes. In order to smooth path tracing results, SVGF helps reduce noise by filtering across space and time the global illumination buffer (ray traced results without albedo / textures) to output a smooth image. TAA is used at the end of the pipeline to remove unwanted aliasing artifacts near the edges.
 
 ## Installation
 - Install [Iris here](https://www.irisshaders.dev/)

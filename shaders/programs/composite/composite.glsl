@@ -45,7 +45,7 @@ void main() {
             0.250 * tilableVoronoi(coord + 0.0, 3, 19.0) +
             0.125 * tilableVoronoi(coord + 0.0, 3, 23.0) - 1.0;
         col.b = 1.0 - tilableVoronoi(coord + 0.5, 6, 9.0);
-
+        
         voronoiColor = col;
     } else {
 		// Retrieve varonoi pattern from saved texture

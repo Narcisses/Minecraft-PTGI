@@ -35,7 +35,7 @@ void main() {
     if ((color.r <= 0.0)) {
         // Draw clouds instead of normal sky
         vec3 rd = getRayDir(texcoord);
-        vec3 col = getSkyColor(rd, true);
+        vec3 col = getSkyColor(rd, true, false);
         vec4 clouds = texture(colortex13, texcoord);
         color.rgb = clouds.rgb + col.rgb * clouds.a;
     }

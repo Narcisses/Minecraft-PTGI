@@ -2,6 +2,7 @@
 #include "/lib/settings/uniforms.glsl"
 #include "/lib/settings/buffers.glsl"
 #include "/lib/common/encoding.glsl"
+#include "/lib/common/texture.glsl"
 #include "/lib/common/screen.glsl"
 
 #ifdef VSH

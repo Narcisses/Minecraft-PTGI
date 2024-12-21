@@ -23,6 +23,11 @@ bool isTerrain(vec2 texcoord) {
     return NdotN > 0.1 && Ndot1 < 1.1 && depth / far < 1.0;
 }
 
+bool isWater(vec2 texcoord) {
+    // Return true if water fragment
+	return texture(colortex12, texcoord).a != 0;
+}
+
 vec2 reprojection(vec2 uv, float depth) {
     vec4 frag = gbufferProjectionInverse * vec4(vec3(uv, depth) * 2.0 - 1.0, 1.0);
     frag /= frag.w;
@@ -35,16 +40,15 @@ vec2 reprojection(vec2 uv, float depth) {
     return prevPos.xy / prevPos.w * 0.5 + 0.5;
 }
 
-vec2 getMotion(vec2 uv) {
-    // Return velocity of pixel
-    return texture(colortex3, uv).rg - 10.0;// * vec2(0.5, -0.5) - 0.5;// * 2.0 - 1.0;
-}
-
 vec3 getPosition(vec2 uv, float depth) {
-    vec4 fragpos0 = gbufferProjectionInverse * (vec4(texcoord, depth, 1.0) * 2.0 - 1.0);
-    fragpos0.xyz /= fragpos0.w;
-    vec3 worldPos = mat3(gbufferModelViewInverse) * fragpos0.xyz;
-    worldPos = worldPos + eyeCameraPosition;
+    vec3 screenPos = vec3(uv, depth);
+    vec3 ndcPos = screenPos * 2.0 - 1.0;
+
+    vec4 homoCoord = gbufferProjectionInverse * vec4(ndcPos, 1.0);
+    vec3 viewPos = homoCoord.xyz / homoCoord.w;
+
+    vec3 eyePlayerPos = mat3(gbufferModelViewInverse) * viewPos.xyz;
+    vec3 worldPos = eyePlayerPos + eyeCameraPosition;
 
 	return worldPos;
 }
@@ -59,8 +63,6 @@ vec2 getDepthAndDerivative(vec2 texcoord) {
 
 vec2 igetDepthAndDerivative(ivec2 fragCoord) {
     vec2 depth = vec2(0.0);
-    // depth.x = texture(depthtex0, texcoord).r;
-    // depth.y = texture(colortex1, texcoord).w;
     depth.x = texelFetch(depthtex0, fragCoord.xy, 0).x;
     depth.y = texelFetch(colortex1, fragCoord.xy, 0).w;
 

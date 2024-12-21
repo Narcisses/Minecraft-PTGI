@@ -61,7 +61,7 @@ vec3 moonAndStars(vec3 rd, vec3 moondir) {
     float moonMask = getMoonMask(rd, moondir);
 
     col += vec3(MOON_BRIGHTNESS) * moonMask;
-    col *= pow(fbmSimple(31.0 * size.xy), 1.8);
+    col *= pow(fbmSimple(31.0 * size.xy), 2.7);
 
     return col;
 }

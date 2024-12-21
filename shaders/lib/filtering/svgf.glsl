@@ -1,32 +1,26 @@
 // Checkcing functions for the temporal pass to check if fragment is valid (same as before)
 bool checkID(float currID, float histID) {
-    return true; //return int(currID + 0.5) == int(histID + 0.5);
+    return int(currID + 0.5) == int(histID + 0.5);
 }
 
 bool checkNormal(vec3 currNormal, vec3 histNormal) {
-    float normalThreshold = 0.50;
+    float normalThreshold = 0.95;
     return dot(currNormal, histNormal) >= normalThreshold;
 }
 
 bool checkDepth(float currDepth, float histDepth) {
-    float depthThreshold = 0.50;
+    float depthThreshold = 0.5;
     return abs(histDepth - currDepth) <= depthThreshold;
 }
 
-bool checkPos(vec3 currPos, vec3 histPos) {
-    float positionTreshold = 0.50;
-    return abs(length(currPos) - length(histPos)) <= positionTreshold;
-}
-
-bool isFragmentValid(vec2 uv, vec3 currNormal, float currID, vec3 histNormal, float currDepth,
-    float histDepth, vec3 currPos, vec3 histPos, float histID) {
+bool isFragmentValid(vec2 uv, vec3 currNormal, float currID, 
+    vec3 histNormal, float currDepth, float histDepth, float histID) {
     bool isID = checkID(currID, histID);
     bool inTex = isWithinTexture(uv);
     bool isNormal = checkNormal(currNormal, histNormal);
     bool isDepth = checkDepth(currDepth, histDepth);
-    bool isPos = checkPos(currPos, histPos);
 
-    return isID && inTex && isNormal && isDepth && isPos;
+    return inTex && isNormal && isDepth && isID;
 }
 
 float computeWeight(float depthCenter, 
@@ -67,27 +61,26 @@ float computeVarianceCenter(sampler2D illuTex, ivec2 ipos) {
 }
 
 vec4 spatialFilter(sampler2D luminanceTexture, vec2 texcoord, int stepSize) {
-    // return texture(luminanceTexture, texcoord);
     float epsilonVariance = 1e-10;
     float kernelg[3] = { 1.0, 2.0 / 3.0, 1.0 / 6.0 };
 
     ivec2 fragCoord = ivec2(gl_FragCoord.xy);
 
     // Get the luminance of the current pixel
-    vec4 illuminationCenter = texelFetch(luminanceTexture, fragCoord, 0); //texture(luminanceTexture, texcoord);
+    vec4 illuminationCenter = texelFetch(luminanceTexture, fragCoord, 0);
     float luminanceCenter = luminance(illuminationCenter.rgb);
 
     // Variance and depth
     float variance = illuminationCenter.w;
     // float variance = computeVarianceCenter(luminanceTexture, fragCoord);
-    vec2 depthCenter = igetDepthAndDerivative(fragCoord).xy; // getDepthAndDerivative(texcoord);
+    vec2 depthCenter = igetDepthAndDerivative(fragCoord).xy;
 
     // Return unchanged color if outside
     if (depthCenter.x >= 1e30 || depthCenter.x < 0.0 || !isTerrain(texcoord)) {
         return illuminationCenter;
     }
 
-    vec3 normalCenter = decodeNormal(texelFetch(gnormal, fragCoord, 0).rgb); //decodeNormal(texture(gnormal, texcoord).rgb);
+    vec3 normalCenter = decodeNormal(texelFetch(gnormal, fragCoord, 0).rgb);
 
     float phiIllumination = PHI_COLOUR * sqrt(max(0.0, epsilonVariance + variance));
     float phiDepth = max(depthCenter.y, 1e-6f) * float(stepSize);
@@ -103,7 +96,6 @@ vec4 spatialFilter(sampler2D luminanceTexture, vec2 texcoord, int stepSize) {
     for (int yy = -radius; yy <= radius; yy++) {
         for (int xx = -radius; xx <= radius; xx++) {
             vec2 pixelUV = texcoord + (vec2(xx, yy) * float(stepSize)) / iresolution;
-            // vec2 pixelUV = (vec2(gl_FragCoord.xy) + vec2(xx, yy) * float(stepSize)) / iresolution;
             ivec2 pixelCoord = fragCoord + ivec2(xx, yy);
             // Weight of the kernel for this pixel (goes decreasing with distance from center)
             float kernel = kernelg[abs(xx)] * kernelg[abs(yy)];
@@ -111,10 +103,10 @@ vec4 spatialFilter(sampler2D luminanceTexture, vec2 texcoord, int stepSize) {
 
             // Skip center pixel, it is already accumulated
             if (isWithinTexture(pixelUV) && !samePixel && isTerrain(pixelUV)) {
-                vec4 pixelColor = texelFetch(luminanceTexture, pixelCoord, 0); //texture(luminanceTexture, pixelUV);
+                vec4 pixelColor = texelFetch(luminanceTexture, pixelCoord, 0);
                 float luminanceP = luminance(pixelColor.rgb);
-                float depthP = igetDepthAndDerivative(pixelCoord).x; //getDepthAndDerivative(pixelUV).x;
-                vec3 normalP = decodeNormal(texelFetch(gnormal, pixelCoord, 0).rgb); //decodeNormal(texture(gnormal, pixelUV).rgb);
+                float depthP = igetDepthAndDerivative(pixelCoord).x;
+                vec3 normalP = decodeNormal(texelFetch(gnormal, pixelCoord, 0).rgb);
 
                 // Compute the edge-stopping functions
                 float w = computeWeight(
@@ -145,11 +137,10 @@ vec4 spatialFilter(sampler2D luminanceTexture, vec2 texcoord, int stepSize) {
 }
 
 vec4 momentsFilter(sampler2D luminanceTexture, vec2 texcoord) {
-    // return texture(luminanceTexture, texcoord);
     float pixelAge = texture(colortex8, texcoord).b;
 
     // Proceed only if enough temporal accumulation
-    // if (pixelAge < 4.0) {
+    if (pixelAge < 4.0) {
         float sumIlluminationWeights = 0.0;
         vec3 sumIllumination = vec3(0.0, 0.0, 0.0);
         vec2 sumMoments = vec2(0.0, 0.0);
@@ -176,7 +167,6 @@ vec4 momentsFilter(sampler2D luminanceTexture, vec2 texcoord) {
         for (int yy = -radius; yy <= radius; yy++) {
             for (int xx = -radius; xx <= radius; xx++) {
                 vec2 pixelUV = texcoord + vec2(xx, yy) / iresolution;
-                // vec2 pixelUV = (vec2(gl_FragCoord.xy) + vec2(xx, yy)) / iresolution;
                 bool samePixel = (xx == 0 && yy == 0);
 
                 if (isWithinTexture(pixelUV) && !samePixel && isTerrain(pixelUV)) {
@@ -215,13 +205,13 @@ vec4 momentsFilter(sampler2D luminanceTexture, vec2 texcoord) {
         float variance = sumMoments.g - sumMoments.r * sumMoments.r;
 
         // Give the variance a boost for the first frames
-        variance *= pixelAge;
+        variance *= 4.0 / pixelAge;
 
         return vec4(sumIllumination, variance);
-    // } else {
-    //     // Pass-through, do nothing if not enough samples
-    //     return texture(luminanceTexture, texcoord);
-    // }
+    } else {
+        // Pass-through, do nothing if not enough samples
+        return texture(luminanceTexture, texcoord);
+    }
 
     return texture(luminanceTexture, texcoord);
 }

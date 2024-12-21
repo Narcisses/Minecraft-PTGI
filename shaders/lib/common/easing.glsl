@@ -17,3 +17,11 @@ float easeInOutSine(float x) {
 float easeInExpo(float x) {
     return (x == 0.0) ? 0.0 : pow(2.0, 10.0 * x - 10.0);
 }
+
+float easeInQuint(float x) {
+    return x * x * x * x * x;
+}
+
+float easeInQuad(float x) {
+    return x * x;
+}

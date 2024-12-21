@@ -1,6 +1,10 @@
 #include "/lib/settings/settings.glsl"
 #include "/lib/settings/uniforms.glsl"
 #include "/lib/settings/buffers.glsl"
+#include "/lib/common/encoding.glsl"
+#include "/lib/atmosphere/cycle.glsl"
+#include "/lib/grading/colors.glsl"
+#include "/lib/materials/materials.glsl"
 #include "/lib/tracing/voxelization.glsl"
 
 #ifdef VSH
@@ -37,10 +41,11 @@ in vec2 texcoord[];
 in vec4 entity[];
 
 out vec4 colorOut;
-out float blockIDOut;
+flat out float blockIDOut;
 
 bool isVoxelizable(int blockID) {
-    return !(blockID < 10000 || (blockID >= 12000 && blockID < 13000) || (blockID >= 15000 && blockID < 15500));
+    // return !(blockID < 10000 || (blockID >= 12000 && blockID < 13000) || (blockID >= 15000 && blockID < 15500));
+    return blockID < 12000 && blockID > 10000;
 }
 
 void main() {
@@ -50,7 +55,7 @@ void main() {
     // List of available blocks to voxelization in blocks.properties file
     int blockID = int(entity[0].x + 0.5);
 
-    if (isVoxelizable(blockID)) {
+    if (isVoxelizable(blockID) || isEmitter(blockID)) {
         // Compute center of voxel using the normals
         // To find the center of the block/voxel
         vec3 triNormal = normalize(cross(position[1] - position[0], position[2] - position[0]));
@@ -69,7 +74,7 @@ void main() {
             // Output the average color of the block in voxel map
             vec2 texcoord = (texcoord[0] + texcoord[1] + texcoord[2]) / 3.0;
             colorOut = ((color[0] + color[1] + color[2]) / 3.0) * texture2D(tex, texcoord);
-            blockIDOut = float(blockID);
+            blockIDOut = encodeID(float(blockID));
             // Only emit one vertex which is center of block/voxel
             // Discard the other vertices of the block
             EmitVertex();
@@ -83,7 +88,7 @@ void main() {
 #ifdef FSH
 
 in vec4 colorOut;
-in float blockIDOut;
+flat in float blockIDOut;
 
 void main() {
     // Write to shadow map voxel block avarage color

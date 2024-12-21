@@ -1,28 +1,29 @@
 // Path tracing
-#define NB_SAMPLES 1        // Number of samples per pixel per frame (max 2)
-#define NB_BOUNCES 2        // Number of times the ray bounces off of blocks
-#define EPSILON 0.001      // Nudging factor for avoiding self-collisions for common blocks (shadow bias)
-#define EPSILON_2 0.075     // Nudging factor for non-voxelizable blocks and exceptions (dirt path, ...)
-#define EPSILON_3 0.001    // Nudging factor for stairs-like blocks (wooden stairs, cobblestone stairs, ...)
+#define NB_SAMPLES 10        // Number of samples per pixel per frame (1)
+#define NB_BOUNCES 4         // Number of times the ray bounces off of blocks (2)
 
 // Voxelization
-#define MAX_STEP 312        // Maximum number of steps allowed when tracing the uniform grid of voxels
-#define VX_VOXEL_SIZE 256   // Size of the voxel map (powers of 2, requires tweaking shadowMapResolution)
+#define MAX_STEP 32         // Maximum number of steps allowed when tracing the uniform grid of voxels (up to 128, 64 good)
+#define VOXEL_SIZE 256      // Size of the voxel map (powers of 2, requires tweaking shadowMapResolution)
 
 // Filtering
-#define HISTORY_SAMPLE_COUNT 90 // Maximum number of accumulated samples (SVGF)
+#define HISTORY_SAMPLE_COUNT 60 // Maximum number of accumulated samples (SVGF) (24, 48, 60, 90)
 #define PHI_COLOUR 10.0
-#define PHI_NORMAL 128.0
+#define PHI_NORMAL 32.0
 
-// Filters
+// Pipeline
+// #define SSR
+#define RAYTRACE
+#define TEMPORAL_ACCUMULATION
 #define FILTER_1
 #define FILTER_2
 #define FILTER_3
 #define FILTER_4
 #define FILTER_5
+#define TAA
 
 // Resolution
-#define RESOLUTION 1.0      // Ray tracing resolution (half resolution good)
+#define RESOLUTION 2.0      // Ray tracing resolution (half resolution good => 2.0, needs shaders.properties modification)
 
 // Gamma
 #define GAMMA 2.2           // Gamma correction coefficient
@@ -34,12 +35,11 @@
 #define MAX_EXPOSURE 2.0    // Maximum exposure (impacts brightness)
 
 // Emission
-#define EMISSION 2.0       // Emission power of bright blocks (glowstone, ...) 96.0
-#define DIRECT_EMISSION 16.0 // Emission power of bright blocks (glowstone, ...)
+#define EMISSION 2.5        // Emission power of bright blocks (glowstone, ...) 96.0
+#define DIRECT_EMISSION 2.0 // Emission power of bright blocks (glowstone, ...)
 
 // Moon
-#define MOON_BRIGHTNESS 5.0
+#define MOON_BRIGHTNESS 64.0
 
 // TAA
-#define SHARPENING 1        // Sharpening filter. [0 1 2]
-#define CAS_AMOUNT 0.3      // Sharpening amount for CAS. [0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0]
+#define CAS_AMOUNT 0.8      // Sharpening amount for CAS. [0.1...1.0]

@@ -35,7 +35,9 @@ vec3 bloomTile(float lod, vec2 offset, vec2 uv, sampler2D tex) {
 
 vec3 getBloom(vec2 uv, sampler2D tex) {
     float alpha = getBloomAlphaAmount();
-    
+
+    alpha = alpha * easeInQuint(eyeBrightnessSmooth.y / 240.0);
+
     // Bloom with multiple bloom tiles
     // Make sure tiles do not overlap (0.5 in Y just to avoid weird samplin bug)
     vec3 blur = vec3(0.0);

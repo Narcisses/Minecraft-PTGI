@@ -1,4 +1,12 @@
-#include "/lib/utils.glsl"
+#include "/lib/settings/settings.glsl"
+#include "/lib/settings/uniforms.glsl"
+#include "/lib/settings/buffers.glsl"
+#include "/lib/common/encoding.glsl"
+#include "/lib/common/texture.glsl"
+#include "/lib/common/screen.glsl"
+#include "/lib/atmosphere/cycle.glsl"
+#include "/lib/grading/colors.glsl"
+#include "/lib/filtering/svgf.glsl"
 
 #ifdef VSH
 
@@ -25,9 +33,9 @@ void main() {
 
     vec4 filteredIllumination;
     #ifdef FILTER_1
-        filteredIllumination = spatialFilter(colortex4, texcoord, 1); // colortex5
+        filteredIllumination = spatialFilter(colortex4, texcoord, 1);
     #else
-        filteredIllumination = texture(colortex5, texcoord);
+        filteredIllumination = texture(colortex4, texcoord);
     #endif
 
     foutput = filteredIllumination;

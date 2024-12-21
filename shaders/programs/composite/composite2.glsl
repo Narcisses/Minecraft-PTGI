@@ -51,7 +51,7 @@ void main() {
         transparencyFarPlane *= getFogAmount();
         clouds.a = clamp(clouds.a + transparencyFarPlane, 0.0, 1.0);
         fogAmount = clamp(fogAmount + transparencyFarPlane, 0.0, 1.0);
-        clouds.rgb = mix(clouds.rgb, getSkyColor(rd, false) * (1.0 - clouds.a), fogAmount);
+        clouds.rgb = mix(clouds.rgb, getSkyColor(rd, false, false) * (1.0 - clouds.a), fogAmount);
     }
 
     // Temporal Upsampling
@@ -59,7 +59,8 @@ void main() {
 
     if (!isFirstFrame() && !hasResolutionChanged() && !hasWorldTimeChanged()) {
         // Skip first frame to avoid black screen
-        float a = (isOutOfTexture(oldUV)) ? 1.0 : 0.01;
+        // Take into account blending during rain/clean events (avoid weird cloud self-shadows)
+        float a = (isOutOfTexture(oldUV)) ? 1.0 : 0.01 + mix(0.0, 0.40, wetness);
         vec4 tempClouds = texture(colortex13, oldUV).xyzw;
         clouds = mix(tempClouds, clouds, a);
     }

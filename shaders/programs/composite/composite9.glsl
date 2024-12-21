@@ -1,4 +1,12 @@
-#include "/lib/utils.glsl"
+#include "/lib/settings/settings.glsl"
+#include "/lib/settings/uniforms.glsl"
+#include "/lib/settings/buffers.glsl"
+#include "/lib/common/encoding.glsl"
+#include "/lib/common/texture.glsl"
+#include "/lib/common/screen.glsl"
+#include "/lib/atmosphere/cycle.glsl"
+#include "/lib/grading/colors.glsl"
+#include "/lib/filtering/svgf.glsl"
 
 #ifdef VSH
 
@@ -21,7 +29,12 @@ layout(location = 1) out vec4 filteredRayTracedIllumination;
 
 void main() {
 	color = texture(colortex0, texcoord);
-	filteredRayTracedIllumination = momentsFilter(colortex5, texcoord);
+
+	#ifdef FILTER_1
+		filteredRayTracedIllumination = momentsFilter(colortex5, texcoord);
+	#else
+		filteredRayTracedIllumination = texture(colortex5, texcoord);
+	#endif
 }
 
 #endif
