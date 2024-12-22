@@ -9,6 +9,7 @@
 #include "/lib/atmosphere/cycle.glsl"
 #include "/lib/atmosphere/moonstars.glsl"
 #include "/lib/atmosphere/ray.glsl"
+#include "/lib/geom/geom.glsl"
 #include "/lib/atmosphere/sky.glsl"
 #include "/lib/atmosphere/clouds.glsl"
 #include "/lib/grading/colors.glsl"
@@ -53,20 +54,6 @@ RayHit getPrimaryRay(vec2 uv) {
 	return RayHit(true, color, emission, position, normal, int(blockID));
 }
 
-float radius = 40;
-
-bool hitSphere(vec3 ro, vec3 rd) {
-	vec3 center = getSunPosition();
-
-	vec3 oc = ro - center;
-	float a = dot(rd, rd);
-	float b = 2.0 * dot(oc, rd);
-	float c = dot(oc, oc) - radius * radius;
-	float discriminant = b * b - 4.0 * a * c;
-
-	return (discriminant > 0.0);
-}
-
 vec3 randomSphereDirection(inout float seed) {
 	vec2 r = hash2(seed);
 	vec2 h = r * vec2(2., 6.28318530718) - vec2(1, 0);
@@ -75,16 +62,17 @@ vec3 randomSphereDirection(inout float seed) {
 	return vec3(sqrt(1. - h.x * h.x) * vec2(sin(phi), cos(phi)), h.x);
 }
 
-vec3 sampleLight(inout float seed) {
+vec3 sampleLight(inout float seed, float radius) {
 	vec3 n = randomSphereDirection(seed) * radius;
 	return getSunPosition() + n;
 }
 
 vec3 directLighting(inout float seed, int i, vec3 position, vec3 normal, vec3 color) {
+	float radius = 40;
 	vec3 outColor;
 
 	// Direct light sampling
-	vec3 ld = sampleLight(seed) - position;
+	vec3 ld = sampleLight(seed, radius) - position;
 	vec3 nld = normalize(ld);
 	RayHit lightHit = voxelTrace(position, nld);
 
@@ -105,13 +93,13 @@ vec4 pathTrace() {
 	vec3 finalColor = vec3(0.0);
 	vec2 uv = texcoord * RESOLUTION;
 
-	for(int j = 0; j < NB_SAMPLES; j++) {
-		float time = 981;
-		#ifdef TEMPORAL_ACCUMULATION
-			time = worldTime;
-		#endif
-		float seed = uv.x + uv.y * 3.43121412313 + fract(1.12345314312 * time) + j;
+	float time = 981;
+	#ifdef TEMPORAL_ACCUMULATION
+		time = worldTime;
+	#endif
+	float seed = uv.x + uv.y * 3.43121412313 + fract(1.12345314312 * time);
 
+	for(int j = 0; j < NB_SAMPLES; j++) {
 		// Color
 		vec3 outColor = vec3(0.0); // color with light added
 		vec3 color = vec3(1.0); // diffuse color
@@ -127,29 +115,28 @@ vec4 pathTrace() {
 		for (int i = 0; i < NB_BOUNCES; i++) {
 			if (i == 0) {
 				// First ray given by rasterizer
-				inrd = normalize(getRayDir(uv));
+				inrd = getRayDir(uv);
 				hit = getPrimaryRay(uv);
-				rd = BRDF(hit.normal, seed, pdf);
 			} else {
 				// Ray trace
 				inrd = rd;
 				hit = voxelTrace(position, rd);
-				rd = BRDF(hit.normal, seed, pdf);
 			}
 
 			normal = hit.normal;
 			epsilon = getEpsilon(float(hit.blockID));
 			position = hit.position + normal * epsilon;
+			rd = BRDF(normal, seed, pdf);
 
 			if (hit.hit) {
 				// We hit the terrain
 				if (isEmitter(int(hit.blockID + 0.5))) {
 					// Block hit emits light
-					outColor += color * vec3(1.0);
+					outColor += hit.color.rgb * vec3(1.0);
 					break;
 				} else {
 					// Block diffuse
-					color *= (hit.color.rgb / 3.14) / pdf;
+					color *= (hit.color.rgb / (2.0 * 3.14)) * max(0.0, abs(dot(normal, rd)) / pdf);
 				}
 			} else {
 				// We missed the terrain, so we hit the sky
@@ -161,6 +148,9 @@ vec4 pathTrace() {
 		}
 
 		finalColor += outColor;
+
+		// Modify seed
+        seed = mod(seed * 1.1234567893490423, 13.0);
 	}
 
 	return vec4(finalColor / NB_SAMPLES, 1.0);

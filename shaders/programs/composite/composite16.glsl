@@ -9,6 +9,7 @@
 #include "/lib/atmosphere/cycle.glsl"
 #include "/lib/atmosphere/moonstars.glsl"
 #include "/lib/atmosphere/ray.glsl"
+#include "/lib/geom/geom.glsl"
 #include "/lib/atmosphere/sky.glsl"
 #include "/lib/water/ssr.glsl"
 

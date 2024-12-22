@@ -30,18 +30,38 @@ float getSunAmount() {
 	return amount;
 }
 
+float getMidDayNormalFrac01() {
+	// Return 0-1.0 from start day to midday
+	// Roll back from 1.0-0 from midday to end day
+	// Return 0.0 if night
+	float startDay = 0.0;
+	float midDay = 6000.0;
+	float endDay = 14000;
+
+	float t = 0.0;
+	if (worldTime >= startDay && worldTime <= midDay) {
+		t = mapRange(worldTime, startDay, midDay, 0.0, 1.0);
+	} else if (worldTime > midDay && worldTime <= endDay) {
+		t = mapRange(worldTime, midDay, endDay, 1.0, 0.0);
+	}
+
+	return t;
+}
+
 float getMidDayFrac01() {
 	// Return 0-1.0 from start day to midday
 	// Roll back from 1.0-0 from midday to end day
 	// Return 0.0 if night
 	float startDay = 0.0;
 	float midDay = 6000.0;
-	float endDay = 13000;
+	float endDay = 14000;
 
 	float t = 0.0;
-
-	if (worldTime >= startDay && worldTime <= midDay) {
-		t = mapRange(worldTime, startDay, midDay, 0.0, 1.0);
+	if (worldTime >= 23000 && worldTime <= 24000) {
+		t = mapRange(worldTime, 23000, 24000, 0.0, 0.333);
+	}
+	else if (worldTime >= startDay && worldTime <= midDay) {
+		t = mapRange(worldTime, startDay, midDay, 0.333, 1.0);
 	} else if (worldTime > midDay && worldTime <= endDay) {
 		t = mapRange(worldTime, midDay, endDay, 1.0, 0.0);
 	}
@@ -56,12 +76,15 @@ float getMidDayFastFrac01() {
 	float startDay = 0.0;
 	float beforeMidday = 2000.0;
 	float afterMidday = 10000.0;
-	float endDay = 13000;
+	float endDay = 14000;
 
 	float t = 0.0;
 
-	if (worldTime >= startDay && worldTime <= beforeMidday) {
-		t = mapRange(worldTime, startDay, beforeMidday, 0.0, 1.0);
+	if (worldTime >= 23000 && worldTime <= 24000) {
+		t = mapRange(worldTime, 23000, 24000, 0.0, 0.333);
+	}
+	else if (worldTime >= startDay && worldTime <= beforeMidday) {
+		t = mapRange(worldTime, startDay, beforeMidday, 0.333, 1.0);
 	} else if (worldTime > beforeMidday && worldTime <= afterMidday) {
 		t = 1.0;
 	} else if (worldTime > afterMidday && worldTime <= endDay) {
@@ -72,6 +95,37 @@ float getMidDayFastFrac01() {
 }
 
 float getSunRiseSetPercentage() {
+	// Return 0.0-1.0 from start pre sunrise and start sunrise
+	// Return 1.0-0.0 from pre sunset to sunset
+	// Return 1.0 if day
+	// Return 0.0 if night
+	float preSunrise = 23000;
+	float sunRise = 24000;
+	float preSunset = 12000;
+	float sunset = 14000;
+
+	float t = 0.0;
+
+	if (worldTime > 1000.0 && worldTime < preSunset) {
+		return 1.0;
+	} else if (worldTime > sunset && worldTime < preSunrise) {
+		return 0.0;
+	}
+
+	if ((worldTime >= 0.0 && worldTime <= 1000.0) || (worldTime >= preSunrise && worldTime < sunRise)) {
+		float newWT = (worldTime >= 0.0 && worldTime <= 1000.0) ? worldTime + 24000 : worldTime;
+		t = mapRange(newWT, preSunrise, sunRise, 0.0, 1.0);
+	}
+
+	if (worldTime >= preSunset && worldTime <= sunset) {
+		t = mapRange(worldTime, preSunset, sunset, 0.0, 1.0);
+		t = 1.0 - t;
+	}
+
+	return t;
+}
+
+float getSunRiseSetPercentage2() {
 	// Return 0.0-1.0 from start pre sunrise and start sunrise
 	// Return 1.0-0.0 from pre sunset to sunset
 	// Return 1.0 if day
@@ -104,7 +158,7 @@ float getSunRiseSetPercentage() {
 
 float getFastSunsetPercentage() {
 	float preSunset = 12000;
-	float sunset = 13000;
+	float sunset = 14000;
 	float preSunrise = 23000;
 	float sunrise = 24000;
 
@@ -127,7 +181,7 @@ float getNightAmount() {
     // Return 1.0-0.0 from midnight to end night
     // Return 0.0 otherwise
 
-    float startNight = 13000;
+    float startNight = 14000;
     float midnight = 18000;
     float endNight = 23000;
 
@@ -146,23 +200,24 @@ float getFogAmount() {
     // Lots of fog when sunset to hide sky-clouds border
 	// In order to make beautiful blending
 
-	return 0.0;
+	return 0.6;
 }
 
 float getBloomAlphaAmount() {
 	// Very small bloom for sunrise and sunset to avoid too much bloom light
 	float sunriseStart = 23000;
 	float sunriseEnd = 24000;
-	float sunsetStart = 11500;
-	float sunsetEnd = 13000;
-	float alphalo = 0.0005;
-	float alphahi = 0.0015;
-	float alpha0 = 0.00005;
+	float sunsetStart = 12500;
+	float sunsetEnd = 14000;
+	float alphalo = 0.0010;
+	float alphahi = 0.015;
+	float alpha0 = 0.0010;
 
 	float t = alphahi;
 
 	if (worldTime >= sunriseStart) {
-		t = mapRange(worldTime, sunriseStart, sunriseEnd, alphalo, alphahi);
+		t = alphahi;
+		// t = mapRange(worldTime, sunriseStart, sunriseEnd, alphalo, alphahi);
 	} else if (worldTime >= sunsetStart && worldTime <= sunsetEnd) {
 		t = mapRange(worldTime, sunsetStart, sunsetEnd, alphahi, alpha0);
 	} else if (worldTime > sunsetEnd && worldTime < sunriseStart) {

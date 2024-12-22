@@ -3,12 +3,14 @@
 #include "/lib/settings/buffers.glsl"
 #include "/lib/common/screen.glsl"
 #include "/lib/common/easing.glsl"
+#include "/lib/common/rand.glsl"
 #include "/lib/common/encoding.glsl"
 #include "/lib/common/texture.glsl"
 #include "/lib/atmosphere/cloudnoise.glsl"
 #include "/lib/atmosphere/cycle.glsl"
 #include "/lib/atmosphere/moonstars.glsl"
 #include "/lib/atmosphere/ray.glsl"
+#include "/lib/geom/geom.glsl"
 #include "/lib/atmosphere/sky.glsl"
 #include "/lib/atmosphere/clouds.glsl"
 
@@ -55,7 +57,10 @@ void main() {
     }
 
     // Temporal Upsampling
+	float seed = texcoord.x + texcoord.y * 3.43121412313 + fract(1.12345314312 * worldTime);
     vec2 oldUV = reprojectPos(rd * dist); // ro
+    vec2 jitterUV = hash2(seed) / (10.0 * iresolution);
+    oldUV += jitterUV;
 
     if (!isFirstFrame() && !hasResolutionChanged() && !hasWorldTimeChanged()) {
         // Skip first frame to avoid black screen

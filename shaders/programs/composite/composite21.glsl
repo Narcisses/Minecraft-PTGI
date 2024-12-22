@@ -7,8 +7,10 @@
 #include "/lib/common/texture.glsl"
 #include "/lib/common/rand.glsl"
 #include "/lib/atmosphere/cycle.glsl"
+#include "/lib/grading/colors.glsl"
 #include "/lib/atmosphere/moonstars.glsl"
 #include "/lib/atmosphere/ray.glsl"
+#include "/lib/geom/geom.glsl"
 #include "/lib/atmosphere/sky.glsl"
 #include "/lib/atmosphere/clouds.glsl"
 #include "/lib/materials/materials.glsl"
@@ -41,7 +43,7 @@ void main() {
 		// color = texture(colortex1, texcoord);
 
 		// Normals
-		// color.rgb = decodeNormal(texture(colortex2, texcoord).rgb);
+		// color.rgb = decodeNormal(texture(gnormal, texcoord).rgb);
 
 		// // Voxel Map
 		// vec3 dir = getRayDir(texcoord);
@@ -50,10 +52,20 @@ void main() {
 
 		// if (hit.hit) {
 		// 	color.rgb = hit.color.rgb;
+		// 	// color.rgb = hit.normal.rgb;
 		// }
 
+		// Sky
+		vec3 dir = getRayDir(texcoord);
+		vec3 col = getSkyColor(dir, false, false);
+
+		float expo = exposure();
+		col = jodieReinhardTonemap(col, expo);
+		col = toLinearSpace(col);
+		color.rgb = col;
+
 		// Illumination
-		color = texture(colortex4, texcoord);
+		// color = texture(colortex4, texcoord);
 	#else
 		color = texture(colortex0, texcoord);
 	#endif

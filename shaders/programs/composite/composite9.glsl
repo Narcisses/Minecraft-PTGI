@@ -7,6 +7,7 @@
 #include "/lib/atmosphere/cycle.glsl"
 #include "/lib/grading/colors.glsl"
 #include "/lib/filtering/svgf.glsl"
+#include "/lib/filtering/bilateral.glsl"
 
 #ifdef VSH
 
@@ -35,6 +36,8 @@ void main() {
 	#else
 		filteredRayTracedIllumination = texture(colortex5, texcoord);
 	#endif
+
+	// filteredRayTracedIllumination = vec4(bilateralBlur(colortex5, texcoord), 1.0);
 }
 
 #endif

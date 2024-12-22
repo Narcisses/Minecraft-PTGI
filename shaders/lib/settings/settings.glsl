@@ -39,7 +39,7 @@
 #define DIRECT_EMISSION 2.0 // Emission power of bright blocks (glowstone, ...)
 
 // Moon
-#define MOON_BRIGHTNESS 64.0
+#define MOON_BRIGHTNESS 4.0
 
 // TAA
 #define CAS_AMOUNT 0.8      // Sharpening amount for CAS. [0.1...1.0]

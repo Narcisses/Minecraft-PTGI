@@ -1,7 +1,7 @@
 vec3 getLightCasterColor() {
 	// Return light color (for clouds)
 	vec3 sunColor = vec3(1.0, 0.9, 0.85) * 1.7;
-	vec3 moonColor = vec3(0.1373, 0.1294, 0.1294) * 1.1;
+	vec3 moonColor = vec3(0.15, 0.16, 0.2) * 1.01;
 	vec3 rainColor = vec3(0.0);
 	
 	sunColor = mix(sunColor, rainColor, wetness);
@@ -22,6 +22,8 @@ vec3 getMoon(vec3 rd) {
 /* Implementation from https://www.shadertoy.com/view/MdGfzh */
 vec3 getSkyColor(vec3 rd, bool doMoonStars, bool fast) {
 	float middayRatio = getMidDayFrac01();
+	float middayNormalAmount = getMidDayNormalFrac01();
+	vec3 sunPos = getSunPosition();
     vec3 sunDir = getSunDir();
 	float sunAmount = getSunAmount();
     float sundot = clamp(dot(rd, sunDir), 0.0, 1.0);
@@ -31,9 +33,11 @@ vec3 getSkyColor(vec3 rd, bool doMoonStars, bool fast) {
 
     // Upper sky color
 	float viewToSunRatio = dot(sunDir, rd) * 0.5 + 0.5;
-	// viewToSunRatio *= (1.0 - getMidDayFastFrac01());
+	viewToSunRatio *= 1.0 - getMidDayFastFrac01();
 	vec3 nearSunColor = mix(vec3(2.45), vec3(0.42, 0.63, 1.0) * 1.01, middayRatio);
-	vec3 farSunColor = vec3(0.34, 0.59, 1.0) * 1.1;
+	vec3 farSunColorSunrise = vec3(0.3, 0.56, 1.0) * 1.1;
+	vec3 farSunColorMidday = vec3(0.83, 0.89, 1.0) * 1.1;
+	vec3 farSunColor = mix(farSunColorSunrise, farSunColorMidday, middayNormalAmount);
 	vec3 upperSkyDay = mix(farSunColor, nearSunColor, viewToSunRatio);
 	vec3 rainSkyColor = vec3(0.02, 0.07, 0.21);
 	upperSkyDay = mix(upperSkyDay, rainSkyColor, wetness);
@@ -45,9 +49,9 @@ vec3 getSkyColor(vec3 rd, bool doMoonStars, bool fast) {
 	vec3 lowerSkyDayColor = vec3(0.53, 0.73, 1.0) * 1.9;
 	vec3 lowerSkyDayMixedColor = mix(lowerSkySunRiseColor, lowerSkyDayColor, middayRatio);
 	vec3 lowerSkyNightColor = vec3(0.0627, 0.0667, 0.0784);
-	vec3 lowerRainSkyColor = vec3(0.22, 0.24, 0.28) * 2.75;
+	vec3 lowerRainSkyColor = vec3(0.16, 0.18, 0.21) * 2.75;
 	lowerSkyDayMixedColor = mix(lowerSkyDayMixedColor, lowerRainSkyColor, wetness);
-	vec3 lowerSkyAmount = mix(lowerSkyNightColor, lowerSkyDayMixedColor, max(0.0, sunAmount));
+	vec3 lowerSkyAmount = mix(lowerSkyNightColor, lowerSkyDayMixedColor, clamp(sunAmount, 0.0, 1.0));
     col = mix(col, 0.85 * lowerSkyAmount, pow(1.0 - max(rd.y, 0.0), 4.0)) * sunAmount;
 
 	// Moon
@@ -58,11 +62,11 @@ vec3 getSkyColor(vec3 rd, bool doMoonStars, bool fast) {
     // Sun
 	vec3 sunWhiteGlowColor = vec3(1.0);
 	
-	vec3 sunOuterGlowColor = vec3(1.0, 0.75, 0.15);
+	vec3 sunOuterGlowColor = vec3(1.0, 0.54, 0.13);
 	vec3 sunInnerGlowColor = vec3(0.99, 0.51, 0.04);
-	vec3 sunColor = vec3(1.0, 0.4, 0.02);
+	vec3 sunColor = vec3(1.0, 0.38, 0.0);
 
-	vec3 sunsetOuterGlowColor = vec3(1.0, 0.62, 0.13);
+	vec3 sunsetOuterGlowColor = vec3(1.0, 0.54, 0.07);
 	vec3 sunsetInnerGlowColor = vec3(1.0, 0.45, 0.01);
 	vec3 sunriseSunColor = vec3(1.0, 0.47, 0.07);
 
@@ -70,17 +74,17 @@ vec3 getSkyColor(vec3 rd, bool doMoonStars, bool fast) {
 	vec3 sunriseInnerGlowColor = vec3(0.99, 0.47, 0.05);
 	vec3 sunsetSunColor = vec3(1.0, 0.45, 0.0);
 
-	sunColor = mix(sunColor, sunWhiteGlowColor, middayRatio);
-	sunInnerGlowColor = mix(sunInnerGlowColor, sunWhiteGlowColor, middayRatio);
+	sunColor = mix(sunColor, sunWhiteGlowColor, easeOutCirc(middayNormalAmount));
+	sunInnerGlowColor = mix(sunInnerGlowColor, sunWhiteGlowColor, easeOutCirc(middayNormalAmount));
 
-	if (worldTime > 0 && worldTime < 12000) {
+	if (worldTime > 0 && worldTime < 12500) {
 		// Sunrise
 		sunOuterGlowColor = mix(sunriseOuterGlowColor, sunOuterGlowColor, middayRatio);
 		sunInnerGlowColor = mix(sunriseInnerGlowColor, sunInnerGlowColor, middayRatio);
 		sunColor = mix(sunriseSunColor, sunColor, middayRatio);
 	}
 
-	if (worldTime > 12000) {
+	if (worldTime > 12500) {
 		// Sunset
 		sunOuterGlowColor = mix(sunsetOuterGlowColor, sunOuterGlowColor, middayRatio);
 		sunInnerGlowColor = mix(sunsetInnerGlowColor, sunInnerGlowColor, middayRatio);
@@ -100,32 +104,35 @@ vec3 getSkyColor(vec3 rd, bool doMoonStars, bool fast) {
 	// Rain
 	float rainLessLight = max(0.01, (1.0 - wetness) * sunsetLessLight);
 
-	// Sun power throughout the day and night
-	float power1 = mix(2.1, 3.0, easeOutCirc(middayRatio)) * rainLessLight;
-	float power2 = mix(2.5, 2.0, easeOutCirc(middayRatio)) * rainLessLight;
-	float intensity1 = mix(10.5, 10.0, easeOutCirc(middayRatio)) * rainLessLight;
-	float intensity2 = mix(18.5, 16.0, easeOutCirc(middayRatio)) * rainLessLight;
-	float concentration1 = mix(4.0, 9.5, easeOutCirc(middayRatio)) * rainLessLight;
-	float concentration2 = mix(4.5, 12.0, easeOutCirc(middayRatio)) * rainLessLight;
+	// // Sun power throughout the day and night
+	// float power1 = mix(1.0, 2.0, middayRatio) * rainLessLight;
+	// float power2 = mix(1.15, 2.0, middayRatio) * rainLessLight;
+	// float power3 = mix(2.35, 2.0, middayRatio) * rainLessLight;
+	// float intensity1 = mix(1.5, 2.0, middayRatio) * rainLessLight;
+	// float intensity2 = mix(2.5, 2.0, middayRatio) * rainLessLight;
+	// float intensity3 = mix(8.5, 8.0, middayRatio) * rainLessLight;
+	// float concentration1 = mix(4.0, 9.5, middayRatio) * rainLessLight;
+	// float concentration2 = mix(4.5, 12.0, middayRatio) * rainLessLight;
+	
+	float power1 = mix(2.0, 2.0, middayRatio) * rainLessLight;
+	float power2 = mix(2.15, 2.0, middayRatio) * rainLessLight;
+	float intensity1 = mix(4.5, 2.0, middayRatio) * rainLessLight;
+	float intensity2 = mix(6.5, 2.0, middayRatio) * rainLessLight;
+	float intensity3 = mix(8.5, 8.0, middayRatio) * rainLessLight;
+	float concentration1 = mix(4.0, 8.5, middayRatio) * rainLessLight;
+	float concentration2 = mix(4.5, 10.0, middayRatio) * rainLessLight;
 
-	// Sun shines brightly when looking at it
-	vec3 vd = getRayDir(vec2(0.5));
-
-	float power = 1.0;
-	if (dot(vd, sunDir) <= 0.0) {
-		power = 2.0;
-	} else {
-		power = clamp(pow(easeInCirc(dot(vd, sunDir)), 2.0) * 72.0, 2.0, 72.0);
-	}
+	// Sun shine power
+	float power = 18.0;
     
 	// Compute sun color
 	col += sunAmount * sunWhiteGlowColor * pow(sundot, concentration1) * power1 * preSunRiseP1 * rainLessLight;
 	col += sunAmount * sunOuterGlowColor * pow(sundot, concentration2) * power2 * preSunRiseP2 * rainLessLight;
-	col += sunAmount * sunInnerGlowColor * pow(sundot, concentration1) * intensity1 * preSunRiseP3 * rainLessLight;
+	col += sunAmount * sunInnerGlowColor * pow(sundot, concentration2) * intensity1 * preSunRiseP3 * rainLessLight;
 	col += sunAmount * sunColor * pow(sundot, concentration1) * intensity2 * preSunRiseP4 * rainLessLight;
 
-	if (!fast)
-		col += sunAmount * sunColor * pow(sundot, 512.0) * power * intensity2 * preSunRiseP4 * rainLessLight * rainLessLight;
+	if (!fast && hitSphere(sunPos, 8.0, vec3(0.0), rd) && dot(rd, sunDir) > 0)
+		col += sunAmount * sunColor * power * intensity3 * preSunRiseP4 * pow(rainLessLight, 4.0);
 
     return max(vec3(0.0), col);
 }
