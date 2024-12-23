@@ -77,6 +77,13 @@ The main feature of this shaderpack is path tracing global illumination which co
 You do not need a RTX graphics card to run this shader. Feel free to take this shader or part of it for use in your projects. This shaderpack does not work on Apple Silicon MacBooks because geometry shaders are not supported.
 
 ## Credits
+This shader has been heavily inspired by Sonic Ether's video on path traced global illumination for SEUS in Minecraft. However, this shaderpack does not borrow any code line from the SEUS shader.
+
+[![SEUS PTGI](https://img.youtube.com/vi/7MV26bOSAyk/0.jpg)](https://www.youtube.com/watch?v=7MV26bOSAyk "SEUS PTGI in Minecraft")
+
+I would also like to thank [coolq1000](https://github.com/coolq1000) without whom this shader would have never existed.
+
+### Code
 - [Clouds](https://www.shadertoy.com/view/MdGfzh)
 - [SVGF](https://research.nvidia.com/publication/2017-07_spatiotemporal-variance-guided-filtering-real-time-reconstruction-path-traced) 
 - [Voxelization](https://github.com/coolq1000/vx-simple) 
