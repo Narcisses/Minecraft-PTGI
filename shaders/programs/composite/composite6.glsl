@@ -80,9 +80,7 @@ vec3 directLighting(inout float seed, int i, vec3 position, vec3 normal, vec3 co
 		vec3 sunPos = getSunPosition();
 		float cos_a_max = sqrt(1. - clamp(radius * radius / dot(sunPos.xyz - position, sunPos.xyz - position), 0., 1.));
 		float weight = 2. * (1. - cos_a_max);
-
-		vec3 p = nld;
-		outColor += (color * getSkyColor(nld, true, true)) * (weight * clamp(dot(nld, normal), 0., 1.));
+		outColor += (color * getSkyColor(nld, true, true)) * (weight * clamp(dot(nld, normal), 0., 1.)) / (2.0 * 3.14);
 	}
 
 	return outColor;
@@ -90,7 +88,11 @@ vec3 directLighting(inout float seed, int i, vec3 position, vec3 normal, vec3 co
 
 vec4 pathTrace() {
 	// Final color for this frame
-	vec3 finalColor = vec3(0.0);
+	float maxAmbientLight = 0.125 + 0.2;
+	float minAmbientLight = 0.085 + 0.2;
+	float ambientLight = mix(maxAmbientLight, minAmbientLight, getMaxBrightness());
+
+	vec3 finalColor = vec3(ambientLight);
 	vec2 uv = texcoord * RESOLUTION;
 
 	float time = 981;
@@ -101,7 +103,7 @@ vec4 pathTrace() {
 
 	for(int j = 0; j < NB_SAMPLES; j++) {
 		// Color
-		vec3 outColor = vec3(0.0); // color with light added
+		vec3 outColor = vec3(0); // color with light added
 		vec3 color = vec3(1.0); // diffuse color
 
 		RayHit hit;
@@ -132,11 +134,11 @@ vec4 pathTrace() {
 				// We hit the terrain
 				if (isEmitter(int(hit.blockID + 0.5))) {
 					// Block hit emits light
-					outColor += hit.color.rgb * vec3(1.0);
-					break;
+					outColor += (hit.color.rgb / (2.0 * 3.14)) * getRayTracedEmission(hit.blockID);
+					// break;
 				} else {
 					// Block diffuse
-					color *= (hit.color.rgb / (2.0 * 3.14)) * max(0.0, abs(dot(normal, rd)) / pdf);
+					color *= (hit.color.rgb / (2.0 * 3.14)) * max(1e-7, abs(dot(normal, rd)) / pdf);
 				}
 			} else {
 				// We missed the terrain, so we hit the sky
@@ -144,7 +146,8 @@ vec4 pathTrace() {
 				break;
 			}
 
-			// outColor += directLighting(seed, i, position, normal, color);
+			// NEE
+			outColor += directLighting(seed, i, position, normal, color);
 		}
 
 		finalColor += outColor;
@@ -160,7 +163,7 @@ void main() {
 	// Ray trace all scene but sky and hand
 	// Here, only the voxelized objects are taken into account by the ray tracer
 	vec2 uv = texcoord;
-	if (isTerrain(uv * RESOLUTION) && uv.x <= 1.0 / RESOLUTION && uv.y <= 1.0 / RESOLUTION) { 
+	if (isTerrain(uv * RESOLUTION) && uv.x <= 1.0 / RESOLUTION && uv.y <= 1.0 / RESOLUTION) {
 		#ifdef RAYTRACE
 			rayTracedIllumination = pathTrace();
 		#else

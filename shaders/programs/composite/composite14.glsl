@@ -31,7 +31,11 @@ void main() {
 	color = texture(colortex0, texcoord);
 
 	#ifdef FILTER_5
-    	foutput = spatialFilter(colortex4, texcoord, 16);
+		if (viewWidth >= 1920.0 / 2.0) {
+    		foutput = spatialFilter(colortex4, texcoord, 16);
+		} else {
+    		foutput = texture(colortex4, texcoord);
+		}
 	#else
     	foutput = texture(colortex4, texcoord);
 	#endif

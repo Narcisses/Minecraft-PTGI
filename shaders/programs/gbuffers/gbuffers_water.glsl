@@ -64,7 +64,9 @@ void main() {
 
 	color.a *= 0.5;
 
-	positions = vec4(position, 1.0);
+	#ifdef SSR
+		positions = vec4(position, 1.0);
+	#endif
 	normals = vec4(encodeNormal(normal), 1.0);
 	
 	vec2 velocity = calcVelocity(currNDCPos, prevNDCPos);

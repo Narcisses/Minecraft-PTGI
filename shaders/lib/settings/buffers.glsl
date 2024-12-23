@@ -76,7 +76,7 @@ colortex2: GBuffer normals + block ID
 colortex3: Motion buffer
 colortex4: Path traced illumination + variance (SVGF, Albedo Demodulation)
 colortex5: History ray illumination + variance (SVGF, Temporal)
-colortex6: Water position
+colortex6: Water position or hand color
 colortex7: History normal data + block ID (SVGF, Temporal)
 colortex8: History moments (luminance, square luminance) + pixel age + previous depth (SVGF, Temporal)
 colortex9: History TAA (Temporal)

@@ -1,13 +1,13 @@
 // Path tracing
-#define NB_SAMPLES 10        // Number of samples per pixel per frame (1)
+#define NB_SAMPLES 6        // Number of samples per pixel per frame (1)
 #define NB_BOUNCES 4         // Number of times the ray bounces off of blocks (2)
 
 // Voxelization
-#define MAX_STEP 32         // Maximum number of steps allowed when tracing the uniform grid of voxels (up to 128, 64 good)
+#define MAX_STEP 24         // Maximum number of steps allowed when tracing the uniform grid of voxels (up to 128, 64 good)
 #define VOXEL_SIZE 256      // Size of the voxel map (powers of 2, requires tweaking shadowMapResolution)
 
 // Filtering
-#define HISTORY_SAMPLE_COUNT 60 // Maximum number of accumulated samples (SVGF) (24, 48, 60, 90)
+#define HISTORY_SAMPLE_COUNT 90 // Maximum number of accumulated samples (SVGF) (24, 48, 60, 90)
 #define PHI_COLOUR 10.0
 #define PHI_NORMAL 32.0
 
@@ -35,7 +35,7 @@
 #define MAX_EXPOSURE 2.0    // Maximum exposure (impacts brightness)
 
 // Emission
-#define EMISSION 2.5        // Emission power of bright blocks (glowstone, ...) 96.0
+#define EMISSION 4.5        // Emission power of bright blocks (glowstone, ...) 96.0
 #define DIRECT_EMISSION 2.0 // Emission power of bright blocks (glowstone, ...)
 
 // Moon

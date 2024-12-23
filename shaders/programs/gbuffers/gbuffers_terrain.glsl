@@ -81,7 +81,7 @@ void main() {
 	positions = vec4(position, 1.0);
 
 	// For all foliage and flowers
-	if(blockID < 10000) {
+	if (blockID < 10000) {
 		normals = vec4(encodeNormal(vec3(0.0, 1.0, 0.0)), encodeID(blockID));
 	} else {
 		normals = vec4(encodeNormal(normal), encodeID(blockID));

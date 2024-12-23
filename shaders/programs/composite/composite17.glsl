@@ -1,8 +1,8 @@
 #include "/lib/settings/settings.glsl"
 #include "/lib/settings/uniforms.glsl"
 #include "/lib/settings/buffers.glsl"
-#include "/lib/common/screen.glsl"
 #include "/lib/common/encoding.glsl"
+#include "/lib/common/screen.glsl"
 #include "/lib/common/easing.glsl"
 #include "/lib/atmosphere/cycle.glsl"
 #include "/lib/grading/colors.glsl"
@@ -35,11 +35,23 @@ void main() {
 
     // Bloom
     col += getBloom(texcoord, colortex15);
+
+    // Color grading
+    if (isTerrain(texcoord)) {
+        // Apply tint on terrain
+        col *= tint();
+    }
     
     // Tonemapping & Gamma correction
     float expo = exposure();
     col = jodieReinhardTonemap(col, expo);
     col = toLinearSpace(col);
+
+    // Add hand
+    vec3 handColor = texture(colortex6, texcoord).rgb;
+	if (handColor.x > 0) {
+    	col.rgb = handColor;
+	}
 
     // Final color output to screen
 	color = vec4(col, 1.0);

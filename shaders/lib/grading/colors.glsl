@@ -50,30 +50,20 @@ float saturate(float x) {
     return clamp(x, 0.0, 1.0);
 }
 
-// vec3 vibranceSaturation(vec3 color) {
-//     float lum   = dot(color, lumacoeffAP1);
-//     float mn    = min(min(color.r, color.g), color.b);
-//     float mx    = max(max(color.r, color.g), color.b);
-//     float sat   = (1.0 - saturate(mx-mn)) * saturate(1.0-mx) * lum * 5.0;
-//     vec3 light  = vec3((mn + mx) / 2.0);
+vec3 tint() {
+    // Tints / colors
+    vec3 middayColor = vec3(0.43, 0.63, 1.0);
+    vec3 sunriseColor = vec3(1.0, 0.72, 0.32);
+    vec3 nightColor = vec3(0.15, 0.27, 0.51);
+    vec3 neutralTint = vec3(1.0);
 
-//     color   = mix(color, mix(light, color, vibranceInt), saturate(sat));
+    // Day night cycle
+    vec3 dayTint = mix(sunriseColor, middayColor, getMidDayFastFrac01());
+    vec3 nightTint = nightColor;
+    vec3 tint = mix(dayTint, nightTint, getNightAmount());
 
-//     color   = mix(color, light, saturate(1.0-light) * (1.0-vibranceInt) / 2.0 * abs(vibranceInt));
+    // If in caves, no tint
+    tint = mix(neutralTint, tint, getMaxBrightness());
 
-//     color   = mix(vec3(lum), color, saturationInt);
-
-//     return color;
-// }
-
-// vec3 brightnessContrast(vec3 color) {
-//     return (color - 0.5) * constrastInt + 0.5 + brightnessInt;
-// }
-
-// vec3 vignette(vec3 color) {
-//     float fade      = length(uv*2.0-1.0);
-//         fade        = linStep(abs(fade) * 0.5, vignetteStart, vignetteEnd);
-//         fade        = 1.0 - pow(fade, vignetteExponent) * vignetteIntensity;
-
-//     return color * fade;
-// }
+    return tint;
+}
