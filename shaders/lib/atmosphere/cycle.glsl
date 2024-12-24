@@ -196,6 +196,29 @@ float getNightAmount() {
     return t;
 }
 
+float getNightAmount2() {
+    // Return 0.0-1.0 from start night to midnight
+    // Return 1.0-0.0 from midnight to end night
+    // Return 0.0 otherwise
+
+    float preNight = 12500;
+    float startNight = 13500;
+    float preEndNight = 22500;
+    float endNight = 23000;
+
+	float t = 0.0;
+
+	if (worldTime >= preNight && worldTime <= startNight) {
+		t = mapRange(worldTime, preNight, startNight, 0.0, 1.0);
+	} else if (worldTime > startNight && worldTime < preEndNight) {
+		t = 1.0;
+	} else if (worldTime >= preEndNight && worldTime <= endNight) {
+		t = mapRange(worldTime, preEndNight, endNight, 1.0, 0.0);
+	}
+
+    return t;
+}
+
 float getFogAmount() {
     // Lots of fog when sunset to hide sky-clouds border
 	// In order to make beautiful blending
@@ -210,8 +233,8 @@ float getBloomAlphaAmount() {
 	float sunsetStart = 12500;
 	float sunsetEnd = 14000;
 	float alphalo = 0.0010;
-	float alphahi = 0.015;
-	float alpha0 = 0.0010;
+	float alphahi = 0.013;
+	float alpha0 = 0.0008;
 
 	float t = alphahi;
 

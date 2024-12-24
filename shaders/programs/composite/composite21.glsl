@@ -65,15 +65,18 @@ void main() {
 		// color.rgb = col;
 
 		// Illumination
-		// color = texture(colortex4, texcoord);
+		color = texture(colortex4, texcoord);
 
 		// Noise
 		// color.rgb = texture(noisetex, texcoord).rgb;
 		// color.rgb = blueNoise(noisetex, gl_FragCoord.xy);
 
 		// Hand
-		vec3 hand = texture(colortex6, texcoord).rgb;
-		color.rgb = hand;
+		// vec3 hand = texture(colortex6, texcoord).rgb;
+		// color.rgb = hand;
+		
+		// Distance
+		// color.rgb = vec3(linearDepth(texture(depthtex0, texcoord).r));
 	#else
 		color = texture(colortex0, texcoord);
 	#endif

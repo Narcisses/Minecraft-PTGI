@@ -80,20 +80,52 @@ vec3 directLighting(inout float seed, int i, vec3 position, vec3 normal, vec3 co
 		vec3 sunPos = getSunPosition();
 		float cos_a_max = sqrt(1. - clamp(radius * radius / dot(sunPos.xyz - position, sunPos.xyz - position), 0., 1.));
 		float weight = 2. * (1. - cos_a_max);
-		outColor += (color * getSkyColor(nld, true, true)) * (weight * clamp(dot(nld, normal), 0., 1.)) / (2.0 * 3.14);
+		outColor += (color * getSkyColor(nld, true, true)) * (weight * clamp(dot(nld, normal), 0., 1.));// / (2.0 * 3.14);
 	}
 
 	return outColor;
 }
 
+float computeAmbientLight(vec2 uv) {
+	// Day / night
+	float dayAmbient = 0.125;
+	float nightAmbient = 0.005;
+	
+	// Inside / outside
+	float maxAmbientLight = 1.285;
+	float minAmbientLight = 1.035;
+
+	// Time and brightness
+	float timeOfDayAmbientLight = mix(dayAmbient, nightAmbient, getNightAmount2());
+	float brightnessAmbientLight = mix(minAmbientLight, maxAmbientLight, getMaxBrightness());
+
+	// Sides of screen ambient light
+	float minAmbientLightAtSide = 1.0;
+	float maxAmbientLightAtSide = 1.3;
+	float xlength = 0.2;
+	float x;
+	if (uv.x < 0.5) {
+		x = mix(1.0, 0.0, uv.x / xlength);
+	} else {
+		x = mix(0.0, 1.0, (uv.x - (1.0 - xlength)) / xlength);
+	}
+	float ambientAtSide = mix(minAmbientLightAtSide, maxAmbientLightAtSide, x);
+
+	// Faraway light
+	float minFaraway = 1.0;
+	float maxFaraway = 1.5;
+	float farawayAmbientLight = mix(minFaraway, maxFaraway, linearDepth(texture(depthtex0, uv).r));
+
+	// Ambient light
+	float ambientLight = timeOfDayAmbientLight * brightnessAmbientLight * max(1.0, ambientAtSide);//+ farawayAmbientLight;
+
+	return ambientLight;
+}
+
 vec4 pathTrace() {
 	// Final color for this frame
-	float maxAmbientLight = 0.125 + 0.2;
-	float minAmbientLight = 0.085 + 0.2;
-	float ambientLight = mix(maxAmbientLight, minAmbientLight, getMaxBrightness());
-
-	vec3 finalColor = vec3(ambientLight);
 	vec2 uv = texcoord * RESOLUTION;
+	vec3 finalColor = vec3(computeAmbientLight(uv));
 
 	float time = 981;
 	#ifdef TEMPORAL_ACCUMULATION
@@ -101,7 +133,7 @@ vec4 pathTrace() {
 	#endif
 	float seed = uv.x + uv.y * 3.43121412313 + fract(1.12345314312 * time);
 
-	for(int j = 0; j < NB_SAMPLES; j++) {
+	for (int j = 0; j < NB_SAMPLES; j++) {
 		// Color
 		vec3 outColor = vec3(0); // color with light added
 		vec3 color = vec3(1.0); // diffuse color
