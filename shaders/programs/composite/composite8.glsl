@@ -7,6 +7,7 @@
 #include "/lib/common/texture.glsl"
 #include "/lib/atmosphere/cycle.glsl"
 #include "/lib/grading/colors.glsl"
+#include "/lib/materials/materials.glsl"
 #include "/lib/filtering/svgf.glsl"
 
 #ifdef VSH

@@ -75,12 +75,12 @@ uniform float darknessFactor;                   // strength of the darkness effe
 uniform float darknessLightFactor;              // lightmap variations caused by the darkness effect (0.0-1.0) 
 
 // For visual effects
-const float wetnessHalflife = 50.0;
-const float drynessHalflife = 50.0;
-const float eyeBrightnessHalflife = 40.0;
+const float wetnessHalflife = 35.0;
+const float drynessHalflife = 35.0;
+const float eyeBrightnessHalflife = 30.0;
 const float centerDepthHalflife = 1.0;
 const float sunPathRotation = 0.0;
-const float ambientOcclusionLevel = 1.0;
+const float ambientOcclusionLevel = 0.15;
 
 uniform vec3 eyeCameraPosition;
 

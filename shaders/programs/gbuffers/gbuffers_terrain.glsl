@@ -20,7 +20,8 @@ out vec3 normal;
 flat out int blockID;
 out vec4 currNDCPos;
 out vec4 prevNDCPos;
-out vec2 jitterVelocity;
+out vec2 newJitteredPos;
+out vec2 prevJitteredPos;
 
 void main() {
 	gl_Position = ftransform();
@@ -34,12 +35,12 @@ void main() {
 	currNDCPos = gbufferProjection * gbufferModelView * (vec4(camOff, 0.0) + gl_Vertex);
 	prevNDCPos = gbufferPreviousProjection * gbufferPreviousModelView * gl_Vertex;
 	#ifdef TAA
-		vec2 newJitteredPos = TAAJitter(gl_Position.xy, gl_Position.w);
-		vec2 prevJitteredPos = TAAJitterOld(prevNDCPos.xy, prevNDCPos.w);
-		jitterVelocity = prevJitteredPos - newJitteredPos;
+		newJitteredPos = TAAJitter(gl_Position.xy, gl_Position.w);
+		prevJitteredPos = TAAJitterOld(prevNDCPos.xy, prevNDCPos.w);
 		gl_Position.xy = newJitteredPos;
 	#else
-		jitterVelocity = vec2(0.0);
+		newJitteredPos = vec2(0.0);
+		prevJitteredPos = vec2(0.0);
 	#endif
 }
 
@@ -58,7 +59,8 @@ in vec3 normal;
 flat in int blockID;
 in vec4 currNDCPos;
 in vec4 prevNDCPos;
-in vec2 jitterVelocity;
+in vec2 newJitteredPos;
+in vec2 prevJitteredPos;
 
 /* RENDERTARGETS: 0,1,2,3 */
 layout(location = 0) out vec4 color;
@@ -87,7 +89,7 @@ void main() {
 		normals = vec4(encodeNormal(normal), encodeID(blockID));
 	}
 
-	vec2 velocity = calcVelocity(currNDCPos, prevNDCPos);// + jitterVelocity;
+	vec2 velocity = calcVelocity(currNDCPos, prevNDCPos); // + jitterVelocity;
 	motions = vec4(vec2(velocity.x, -velocity.y), 0.0, 1.0);
 }
 

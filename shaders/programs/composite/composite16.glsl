@@ -12,6 +12,7 @@
 #include "/lib/geom/geom.glsl"
 #include "/lib/atmosphere/sky.glsl"
 #include "/lib/water/ssr.glsl"
+#include "/lib/filtering/bilateral.glsl"
 
 #ifdef VSH
 

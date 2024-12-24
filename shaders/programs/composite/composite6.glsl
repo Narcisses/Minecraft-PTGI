@@ -38,10 +38,10 @@ layout(location = 0) out vec4 rayTracedIllumination;
 
 float getEpsilon(float blockID) {
 	// Dirt path
-	if(int(blockID + 0.5) == 10429) {
+	if (int(blockID + 0.5) == 10429) {
 		return 0.1;
 	}
-	return 0.001;
+	return 0.01;
 }
 
 RayHit getPrimaryRay(vec2 uv) {
@@ -68,7 +68,7 @@ vec3 sampleLight(inout float seed, float radius) {
 }
 
 vec3 directLighting(inout float seed, int i, vec3 position, vec3 normal, vec3 color) {
-	float radius = 40;
+	float radius = 15;
 	vec3 outColor;
 
 	// Direct light sampling
@@ -80,7 +80,7 @@ vec3 directLighting(inout float seed, int i, vec3 position, vec3 normal, vec3 co
 		vec3 sunPos = getSunPosition();
 		float cos_a_max = sqrt(1. - clamp(radius * radius / dot(sunPos.xyz - position, sunPos.xyz - position), 0., 1.));
 		float weight = 2. * (1. - cos_a_max);
-		outColor += (color * getSkyColor(nld, true, true)) * (weight * clamp(dot(nld, normal), 0., 1.));// / (2.0 * 3.14);
+		outColor += (color * getSkyColor(nld, true, true)) * (weight * clamp(dot(nld, normal), 0., 1.)) / (2.0 * 3.14);
 	}
 
 	return outColor;
@@ -88,12 +88,12 @@ vec3 directLighting(inout float seed, int i, vec3 position, vec3 normal, vec3 co
 
 float computeAmbientLight(vec2 uv) {
 	// Day / night
-	float dayAmbient = 0.125;
+	float dayAmbient = 0.030;
 	float nightAmbient = 0.005;
 	
 	// Inside / outside
-	float maxAmbientLight = 1.285;
-	float minAmbientLight = 1.035;
+	float maxAmbientLight = 1.085;
+	float minAmbientLight = 5.935;
 
 	// Time and brightness
 	float timeOfDayAmbientLight = mix(dayAmbient, nightAmbient, getNightAmount2());
@@ -101,8 +101,8 @@ float computeAmbientLight(vec2 uv) {
 
 	// Sides of screen ambient light
 	float minAmbientLightAtSide = 1.0;
-	float maxAmbientLightAtSide = 1.3;
-	float xlength = 0.2;
+	float maxAmbientLightAtSide = 1.5;
+	float xlength = 0.4;
 	float x;
 	if (uv.x < 0.5) {
 		x = mix(1.0, 0.0, uv.x / xlength);

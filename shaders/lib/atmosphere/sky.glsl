@@ -107,9 +107,9 @@ vec3 getSkyColor(vec3 rd, bool doMoonStars, bool fast) {
 	// Sun power throughout the day and night
 	float power1 = mix(2.0, 2.0, middayRatio) * rainLessLight;
 	float power2 = mix(4.15, 2.0, middayRatio) * rainLessLight;
-	float intensity1 = mix(6.5, 2.0, middayRatio) * rainLessLight;
+	float intensity1 = mix(4.5, 2.0, middayRatio) * rainLessLight;
 	float intensity2 = mix(8.5, 4.0, middayRatio) * rainLessLight;
-	float intensity3 = mix(12.5, 8.0, middayRatio) * rainLessLight;
+	float intensity3 = mix(10.5, 8.0, middayRatio) * rainLessLight;
 	float concentration1 = mix(4.0, 8.5, middayRatio) * rainLessLight;
 	float concentration2 = mix(4.5, 10.0, middayRatio) * rainLessLight;
 

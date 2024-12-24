@@ -6,6 +6,7 @@
 #include "/lib/common/screen.glsl"
 #include "/lib/atmosphere/cycle.glsl"
 #include "/lib/grading/colors.glsl"
+#include "/lib/materials/materials.glsl"
 #include "/lib/filtering/svgf.glsl"
 #include "/lib/filtering/bilateral.glsl"
 

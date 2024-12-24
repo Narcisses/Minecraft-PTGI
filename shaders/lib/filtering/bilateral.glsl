@@ -1,6 +1,6 @@
-#define SIGMA 20
-#define BSIGMA 0.9
-#define MSIZE 15
+#define SIGMA 10
+#define BSIGMA 0.1
+#define MSIZE 10
 
 float normpdf(in float x, in float sigma) {
     return 0.39894 * exp(-0.5 * x * x / (sigma * sigma)) / sigma;
