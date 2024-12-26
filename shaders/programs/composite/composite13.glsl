@@ -32,7 +32,7 @@ void main() {
 	color = texture(colortex0, texcoord);
 
 	#ifdef FILTER_4
-		if (viewWidth >= 1920.0 / 2.0) {
+		if (!isGameAtHalfResolution()) {
     		foutput = spatialFilter(colortex4, texcoord, 8);
 		} else {
     		foutput = texture(colortex4, texcoord);

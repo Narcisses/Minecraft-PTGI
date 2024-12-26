@@ -133,7 +133,11 @@ vec4 pathTrace() {
 	#endif
 	float seed = uv.x + uv.y * 3.43121412313 + fract(1.12345314312 * time);
 
-	for (int j = 0; j < NB_SAMPLES; j++) {
+	int halfResNbSamples = isGameAtHalfResolution() ? 4 : 0;
+	int midResNbSamples = isGameAtMidResolution() ? 2 : 0;
+	int nbSamples = NB_SAMPLES + halfResNbSamples + midResNbSamples;
+
+	for (int j = 0; j < nbSamples; j++) {
 		// Color
 		vec3 outColor = vec3(0); // color with light added
 		vec3 color = vec3(1.0); // diffuse color
@@ -188,7 +192,7 @@ vec4 pathTrace() {
         seed = mod(seed * 1.1234567893490423, 13.0);
 	}
 
-	return vec4(finalColor / NB_SAMPLES, 1.0);
+	return vec4(finalColor / nbSamples, 1.0);
 }
 
 void main() {
