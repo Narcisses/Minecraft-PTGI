@@ -36,7 +36,7 @@
 
 // Emission
 #define EMISSION 2.5        // Emission power of bright blocks (glowstone, ...) 96.0
-#define DIRECT_EMISSION 2.0 // Emission power of bright blocks (glowstone, ...)
+#define DIRECT_EMISSION 2.5 // Emission power of bright blocks (glowstone, ...)
 
 // Moon
 #define MOON_BRIGHTNESS 2.0

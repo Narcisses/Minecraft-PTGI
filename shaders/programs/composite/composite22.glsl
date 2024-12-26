@@ -85,6 +85,15 @@ void main() {
 		
 		// Distance
 		// color.rgb = vec3(linearDepth(texture(depthtex0, texcoord).r));
+
+		// Jitter
+		// color.rgb = vec3(newframemod8 - framemod8);
+
+		// Distance
+		// color = texture(colortex1, texcoord);
+
+		// Velocity buffer
+		// color.rgb = vec3(texture(colortex3, texcoord).rg * 10000, 0.0);
 	#else
 		color = texture(colortex0, texcoord);
 	#endif

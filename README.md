@@ -44,6 +44,7 @@ This repository presents a shaderpack for Minecraft 1.21 with Iris that implemen
 - Temporal Anti-Aliasing (TAA)
 - Temporal reprojection & motion buffers
 - Upscaling
+- Motion blur
 - Sky
 - Volumetric clouds
 - Day/night cycle

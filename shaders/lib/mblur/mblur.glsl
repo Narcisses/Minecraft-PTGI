@@ -1,11 +1,11 @@
 const float DEPTH_THRESHOLD = 0.66;
-#define MOTION_BLUR_STRENGTH 0.30
+#define MOTION_BLUR_STRENGTH 0.40
 #define MOTION_BLUR_SAMPLES 6
 
 vec3 motionBlur(sampler2D tex, vec2 texcoord, vec3 color, float z, float dither) {
     if (z <= DEPTH_THRESHOLD) return color;
 
-    vec2 velocity = texture(colortex3, texcoord).xy;
+    vec2 velocity = -texture(colortex3, texcoord).xy;
     velocity = velocity / (1.0 + length(velocity)) * MOTION_BLUR_STRENGTH;
 
     vec3 mblur = vec3(0.0);

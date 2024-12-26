@@ -4,7 +4,7 @@ bool checkID(float currID, float histID) {
 }
 
 bool checkNormal(vec3 currNormal, vec3 histNormal) {
-    float normalThreshold = 0.50; //0.95;
+    float normalThreshold = 0.95;
     return dot(currNormal, histNormal) >= normalThreshold;
 }
 
@@ -19,8 +19,6 @@ bool isFragmentValid(vec2 uv, vec3 currNormal, float currID,
     bool inTex = isWithinTexture(uv);
     bool isNormal = checkNormal(currNormal, histNormal);
     bool isDepth = checkDepth(currDepth, histDepth);
-
-    isID = isID || currID <= 0 || isEmitter(int(currID + 0.5)) == isEmitter(int(histID + 0.5));
 
     return isNormal && isDepth && inTex && isID;
 }

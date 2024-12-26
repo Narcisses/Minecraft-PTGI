@@ -38,6 +38,8 @@ void main() {
 		newJitteredPos = TAAJitter(gl_Position.xy, gl_Position.w);
 		prevJitteredPos = TAAJitterOld(prevNDCPos.xy, prevNDCPos.w);
 		gl_Position.xy = newJitteredPos;
+		newJitteredPos -= gl_Position.xy;
+		prevJitteredPos -= prevNDCPos.xy;
 	#else
 		newJitteredPos = vec2(0.0);
 		prevJitteredPos = vec2(0.0);
@@ -73,7 +75,7 @@ void main() {
 
 	// Get emission (for glow stone emission)
 	vec3 emission = getEmission(blockID, color.rgb);
-	// color.rgb += emission;
+	color.rgb += emission;
 
 	color *= texture(lightmap, lmcoord);
 	if(color.a < alphaTestRef) {
@@ -89,8 +91,15 @@ void main() {
 		normals = vec4(encodeNormal(normal), encodeID(blockID));
 	}
 
-	vec2 velocity = calcVelocity(currNDCPos, prevNDCPos); // + jitterVelocity;
-	motions = vec4(vec2(velocity.x, -velocity.y), 0.0, 1.0);
+	vec4 cNDCPos = currNDCPos;
+	vec4 pNDCPos = prevNDCPos;
+	cNDCPos.xy -= newJitteredPos;
+	pNDCPos.xy -= prevJitteredPos;
+
+	vec2 velocity = calcVelocity(cNDCPos, pNDCPos);
+	velocity = vec2(velocity.x, -velocity.y);
+	
+	motions = vec4(velocity, 0.0, 1.0);
 }
 
 #endif
