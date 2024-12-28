@@ -17,7 +17,7 @@ void main() {
 
 in vec2 texcoord;
 
-/* RENDERTARGETS: 0,2 */
+/* RENDERTARGETS: 0,14 */
 layout(location = 0) out vec4 color;
 layout(location = 1) out vec4 currFrameData;
 
@@ -28,7 +28,7 @@ void main() {
 	#ifdef TAA
 		currFrameData = texture2D(colortex0, texcoord);
 	#else
-		currFrameData = texture(gnormal, texcoord);
+		currFrameData = texture(colortex14, texcoord);
 	#endif
 }
 

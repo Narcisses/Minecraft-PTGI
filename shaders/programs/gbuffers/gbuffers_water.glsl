@@ -18,7 +18,7 @@ out vec4 prevNDCPos;
 void main() {
 	gl_Position = ftransform();
 	#ifdef TAA
-		gl_Position.xy = TAAJitter(gl_Position.xy, gl_Position.w);
+		gl_Position.xy = TAAJitter(gl_Position.xy, gl_Position.w, false);
 	#endif
 	position = gl_Vertex.xyz;
 	normal = gl_Normal.xyz;
@@ -45,11 +45,11 @@ in vec3 normal;
 in vec4 currNDCPos;
 in vec4 prevNDCPos;
 
-/* RENDERTARGETS: 0,3,6,12 */
+/* RENDERTARGETS: 0 */ //,3,6,12
 layout(location = 0) out vec4 color;
-layout(location = 1) out vec4 motions;
-layout(location = 2) out vec4 positions;
-layout(location = 3) out vec4 normals;
+// layout(location = 1) out vec4 motions;
+// layout(location = 2) out vec4 positions;
+// layout(location = 3) out vec4 normals;
 
 void main() {
 	color = texture(gtexture, texcoord) * glcolor;
@@ -62,15 +62,13 @@ void main() {
 		color.a = 1.0;
 	}
 
-	color.a *= 0.5;
+	color.a *= 0.30;
 
-	#ifdef SSR
-		positions = vec4(position, 1.0);
-	#endif
-	normals = vec4(encodeNormal(normal), 1.0);
+	// positions = vec4(positions, 1.0),
+	// normals = vec4(encodeNormal(normal), encodeID(blockID));
 	
-	vec2 velocity = calcVelocity(currNDCPos, prevNDCPos);
-	motions = vec4(vec2(velocity.x, -velocity.y), 0.0, 1.0);
+	// vec2 velocity = calcVelocity(currNDCPos, prevNDCPos);
+	// motions = vec4(vec2(velocity.x, -velocity.y), 0.0, 1.0);
 }
 
 #endif

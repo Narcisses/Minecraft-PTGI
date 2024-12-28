@@ -18,7 +18,7 @@ out vec4 prevNDCPos;
 void main() {
 	gl_Position = ftransform();
 	#ifdef TAA
-		gl_Position.xy = TAAJitter(gl_Position.xy, gl_Position.w);
+		gl_Position.xy = TAAJitter(gl_Position.xy, gl_Position.w, false);
 	#endif
 	position = gl_Vertex.xyz;
 	normal = gl_Normal.xyz;

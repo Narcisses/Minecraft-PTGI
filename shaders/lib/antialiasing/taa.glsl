@@ -32,7 +32,7 @@ vec3 NeighbourhoodClamping(vec2 texcoord, vec3 color, vec3 tempColor, vec2 view)
 
 	for(int i = 0; i < 8; i++) {
 		vec2 offset = neighbourhoodOffsets[i] * view;
-		vec3 clr = texture2DLod(colortex2, texcoord + offset, 0.0).rgb;
+		vec3 clr = texture2DLod(colortex14, texcoord + offset, 0.0).rgb;
 		minclr = min(minclr, clr); maxclr = max(maxclr, clr);
 	}
 

@@ -17,7 +17,7 @@ out vec4 prevNDCPos;
 void main() {
 	gl_Position = ftransform();
 	#ifdef TAA
-		gl_Position.xy = TAAJitter(gl_Position.xy, gl_Position.w);
+		gl_Position.xy = TAAJitter(gl_Position.xy, gl_Position.w, false);
 	#endif
 	normal = gl_Normal.xyz;
 	texcoord = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;
@@ -54,19 +54,15 @@ void main() {
 	if (col.a < alphaTestRef) {
 		discard;
 	}
-
-	#ifdef SSR
-		handColor = vec4(-10.0);
-		// normals = vec4(encodeNormal(vec3(0.0)), 1.0);
-		// vec2 velocity = calcVelocity(currNDCPos, prevNDCPos);
-		// motions = vec4(vec2(velocity.x, -velocity.y), 0.0, 1.0);
-		// color = col;
-	#else
-		// normals = texture(gnormal, texcoord);
-		// motions = texture(colortex3, texcoord);
-		// color = texture(colortex0, texcoord);
-		handColor = col;
-	#endif
+	
+	// normals = vec4(encodeNormal(vec3(0.0)), 1.0);
+	// vec2 velocity = calcVelocity(currNDCPos, prevNDCPos);
+	// motions = vec4(vec2(velocity.x, -velocity.y), 0.0, 1.0);
+	// color = col;
+	// normals = texture(gnormal, texcoord);
+	// motions = texture(colortex3, texcoord);
+	// color = texture(colortex0, texcoord);
+	handColor = col;
 }
 
 #endif

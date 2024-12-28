@@ -18,7 +18,7 @@ void main() {
 
 in vec2 texcoord;
 
-/* RENDERTARGETS: 0,2,9 */
+/* RENDERTARGETS: 0,14,9 */
 layout(location = 0) out vec4 color;
 layout(location = 1) out vec4 currFrame;
 layout(location = 2) out vec4 pastFrame;
@@ -27,13 +27,13 @@ void main() {
     color = texture(colortex0, texcoord);
 
 	#ifdef TAA
-		vec3 color = texture2DLod(colortex2, texcoord, 0.0).rgb;
+		vec3 color = texture2DLod(colortex14, texcoord, 0.0).rgb;
 		vec4 prev = TemporalAA(texcoord, color, 0.0);
 
 		currFrame = vec4(color, 1.0);
 		pastFrame = vec4(prev);
 	#else
-		currFrame = texture(gnormal, texcoord);
+		currFrame = texture(colortex14, texcoord);
 	#endif
 }
 

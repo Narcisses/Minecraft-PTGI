@@ -24,7 +24,7 @@ layout(location = 0) out vec4 color;
 
 void main() {
 	#ifdef TAA
-		vec3 col = texture2DLod(colortex2, texcoord, 0).rgb;
+		vec3 col = texture2DLod(colortex14, texcoord, 0).rgb;
 		SharpenFilter(col, texcoord);
 		color = vec4(col, 1.0);
 	#else

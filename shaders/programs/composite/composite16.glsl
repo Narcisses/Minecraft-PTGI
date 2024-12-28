@@ -1,18 +1,6 @@
 #include "/lib/settings/settings.glsl"
 #include "/lib/settings/uniforms.glsl"
 #include "/lib/settings/buffers.glsl"
-#include "/lib/common/encoding.glsl"
-#include "/lib/common/texture.glsl"
-#include "/lib/common/screen.glsl"
-#include "/lib/common/easing.glsl"
-#include "/lib/common/rand.glsl"
-#include "/lib/atmosphere/cycle.glsl"
-#include "/lib/atmosphere/moonstars.glsl"
-#include "/lib/atmosphere/ray.glsl"
-#include "/lib/geom/geom.glsl"
-#include "/lib/atmosphere/sky.glsl"
-#include "/lib/water/ssr.glsl"
-#include "/lib/filtering/bilateral.glsl"
 
 #ifdef VSH
 
@@ -34,14 +22,6 @@ layout(location = 0) out vec4 color;
 
 void main() {
     color = texture(colortex0, texcoord);
-
-    #ifdef SSR
-        if (isWater(texcoord) && isEyeInWater == 0) {
-            // SSR
-            vec3 waterNormal = decodeNormal(texture(colortex12, texcoord).xyz);
-            color = waterColor(waterNormal, color, texcoord);
-        }
-    #endif
 }
 
 #endif

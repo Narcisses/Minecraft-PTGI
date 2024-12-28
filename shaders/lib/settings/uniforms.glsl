@@ -80,7 +80,7 @@ const float drynessHalflife = 35.0;
 const float eyeBrightnessHalflife = 30.0;
 const float centerDepthHalflife = 1.0;
 const float sunPathRotation = 0.0;
-const float ambientOcclusionLevel = 0.60;
+const float ambientOcclusionLevel = 0.30;
 
 uniform vec3 eyeCameraPosition;
 

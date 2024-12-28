@@ -14,7 +14,7 @@ out vec4 prevNDCPos;
 void main() {
 	gl_Position = ftransform();
 	#ifdef TAA
-		gl_Position.xy = TAAJitter(gl_Position.xy, gl_Position.w);
+		gl_Position.xy = TAAJitter(gl_Position.xy, gl_Position.w, false);
 	#endif
 	glcolor = gl_Color;
 	vec3 camOff = previousCameraPosition - cameraPosition;

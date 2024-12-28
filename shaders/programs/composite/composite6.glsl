@@ -86,6 +86,18 @@ vec3 directLighting(inout float seed, int i, vec3 position, vec3 normal, vec3 co
 	return outColor;
 }
 
+float getLightFalloffDistanceFromCenter(RayHit hit) {
+	// Decrease factor as fragment goes outside block
+	vec3 withinVoxel = hit.position + fract(cameraPosition) - hit.normal * 0.1;
+	vec3 roundedVoxel = floor(withinVoxel) + vec3(0.5);
+	float d = distance(hit.position + fract(cameraPosition), roundedVoxel);
+	d = clamp(d, 0.0, 1.0);
+	d = easeOutCirc(d);
+	d = 1.0 - d;
+
+	return d;
+}
+
 float computeAmbientLight(vec2 uv) {
 	// Day / night
 	float dayAmbient = 0.030;
@@ -170,8 +182,9 @@ vec4 pathTrace() {
 				// We hit the terrain
 				if (isEmitter(int(hit.blockID + 0.5))) {
 					// Block hit emits light
-					outColor += (hit.color.rgb / (2.0 * 3.14)) * getRayTracedEmission(hit.blockID);
-					// break;
+					float d = getLightFalloffDistanceFromCenter(hit);
+					outColor += (hit.color.rgb / (2.0 * 3.14)) * getRayTracedEmission(hit.blockID) * d;
+					break;
 				} else {
 					// Block diffuse
 					color *= (hit.color.rgb / (2.0 * 3.14)) * max(1e-7, abs(dot(normal, rd)) / pdf);

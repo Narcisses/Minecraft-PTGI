@@ -9,18 +9,45 @@ bool checkNormal(vec3 currNormal, vec3 histNormal) {
 }
 
 bool checkDepth(float currDepth, float histDepth) {
-    float depthThreshold = 0.5;
+    float depthThreshold = 0.50;
     return abs(histDepth - currDepth) <= depthThreshold;
 }
 
+bool checkPosition(vec3 currPos, vec3 histPos) {
+    float distThreshold = 0.90;
+    return distance(currPos, histPos) <= distThreshold;
+}
+
 bool isFragmentValid(vec2 uv, vec3 currNormal, float currID, 
-    vec3 histNormal, float currDepth, float histDepth, float histID) {
+    vec3 histNormal, float currDepth, float histDepth, float histID,
+    vec3 currPos, vec3 histPos) {
     bool isID = checkID(currID, histID);
     bool inTex = isWithinTexture(uv);
     bool isNormal = checkNormal(currNormal, histNormal);
     bool isDepth = checkDepth(currDepth, histDepth);
+    bool isPos = checkPosition(currPos, histPos);
 
-    return isNormal && isDepth && inTex && isID;
+    // If too far away, just consider position to be true (because of TAA jittering)
+    // if (linearDepth(currDepth) > 0.25) {
+    //     isPos = true;
+    // }
+
+    // if (isEmitter(int(currID + 0.5)) || isEmitter(int(histID + 0.5)))
+    //     return false;
+
+    // When looking at blocks from grazing angle, just assume we can return true (because of TAA jittering)
+    vec3 dir = getRayDir(uv);
+	float alikeness = abs(dot(-dir, currNormal));
+
+    // float alikenessDerivative = max(abs(dFdx(alikeness)), abs(dFdy(alikeness)));
+    // if (alikenessDerivative > 0.00001)
+    //     return true;
+
+    // float alikenessDerivative = max(abs(dFdx(length(currPos))), abs(dFdy(length(currPos))));
+    // if (linearDepth(currDepth) > 0.1 && alikenessDerivative > 0.50 && linearDepth(currDepth) < 0.15 && (dot(currNormal, vec3(0, 1, 0)) > 0.90 || dot(histNormal, vec3(0, 1, 0)) > 0.90))
+    //     return true;
+
+    return isPos && isNormal && isDepth && inTex && isID;
 }
 
 float computeWeight(float depthCenter, 

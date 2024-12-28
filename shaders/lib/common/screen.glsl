@@ -5,6 +5,7 @@ bool isFirstFrame() {
 bool hasResolutionChanged() {
     float epsilon = 10.0;
     vec2 oldSize = vec2(screenData.width, screenData.height);
+    
     return (abs(viewWidth - oldSize.x) > epsilon) || (abs(viewHeight - oldSize.y) > epsilon);
 }
 
@@ -19,6 +20,7 @@ bool isGameAtMidResolution() {
 bool hasWorldTimeChanged() {
     float epsilon = 100.0;
     float oldWorlTime = screenData.worldtime;
+
     return abs(worldTime - oldWorlTime) > epsilon;
 }
 
@@ -28,12 +30,8 @@ bool isTerrain(vec2 texcoord) {
     float depth = texture(depthtex0, texcoord).r;
     float NdotN = dot(normal, normal);
     float Ndot1 = dot(normal, vec3(1.0));
-    return NdotN > 0.1 && Ndot1 < 1.1 && depth / far < 1.0;
-}
 
-bool isWater(vec2 texcoord) {
-    // Return true if water fragment
-	return texture(colortex12, texcoord).a != 0;
+    return NdotN > 0.1 && Ndot1 < 1.1 && depth / far < 1.0;
 }
 
 vec2 reprojection(vec2 uv, float depth) {

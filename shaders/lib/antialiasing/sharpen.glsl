@@ -1,24 +1,3 @@
-// vec2 sharpenOffsets[4] = vec2[4](
-// 	vec2( 1.0,  0.0),
-// 	vec2( 0.0,  1.0),
-// 	vec2(-1.0,  0.0),
-// 	vec2( 0.0, -1.0)
-// );
-
-
-// void SharpenFilter(inout vec3 color, vec2 coord) {
-// 	float mult = MC_RENDER_QUALITY * 0.125;
-// 	vec2 view = 1.0 / iresolution;
-
-// 	color *= MC_RENDER_QUALITY * 0.5 + 1.0;
-
-// 	for(int i = 0; i < 4; i++) {
-// 		vec2 offset = sharpenOffsets[i] * view;
-// 		color -= texture2D(colortex1, coord + offset).rgb * mult;
-// 	}
-// }
-
-
 #define textureLod0Offset(img, coord, offset) textureLodOffset(img, coord, 0.0f, offset)
 #define textureLod0(img, coord) textureLod(img, coord, 0.0f)
 
@@ -27,15 +6,15 @@ void SharpenFilter(inout vec3 color, vec2 textureCoord) {
     //  a b c
     //  d(e)f
     //  g h i
-    vec3 a = textureLod0Offset(colortex2, textureCoord, ivec2(-1,-1)).rgb;
-    vec3 b = textureLod0Offset(colortex2, textureCoord, ivec2( 0,-1)).rgb;
-    vec3 c = textureLod0Offset(colortex2, textureCoord, ivec2( 1,-1)).rgb;
-    vec3 d = textureLod0Offset(colortex2, textureCoord, ivec2(-1, 0)).rgb;
+    vec3 a = textureLod0Offset(colortex14, textureCoord, ivec2(-1,-1)).rgb;
+    vec3 b = textureLod0Offset(colortex14, textureCoord, ivec2( 0,-1)).rgb;
+    vec3 c = textureLod0Offset(colortex14, textureCoord, ivec2( 1,-1)).rgb;
+    vec3 d = textureLod0Offset(colortex14, textureCoord, ivec2(-1, 0)).rgb;
     vec3 e = color;
-    vec3 f = textureLod0Offset(colortex2, textureCoord, ivec2( 1, 0)).rgb;
-    vec3 g = textureLod0Offset(colortex2, textureCoord, ivec2(-1, 1)).rgb;
-    vec3 h = textureLod0Offset(colortex2, textureCoord, ivec2( 0, 1)).rgb;
-    vec3 i = textureLod0Offset(colortex2, textureCoord, ivec2( 1, 1)).rgb;
+    vec3 f = textureLod0Offset(colortex14, textureCoord, ivec2( 1, 0)).rgb;
+    vec3 g = textureLod0Offset(colortex14, textureCoord, ivec2(-1, 1)).rgb;
+    vec3 h = textureLod0Offset(colortex14, textureCoord, ivec2( 0, 1)).rgb;
+    vec3 i = textureLod0Offset(colortex14, textureCoord, ivec2( 1, 1)).rgb;
 
     // Soft min and max.
     //  a b c             b

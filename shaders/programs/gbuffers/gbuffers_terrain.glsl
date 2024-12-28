@@ -35,14 +35,14 @@ void main() {
 	currNDCPos = gbufferProjection * gbufferModelView * (vec4(camOff, 0.0) + gl_Vertex);
 	prevNDCPos = gbufferPreviousProjection * gbufferPreviousModelView * gl_Vertex;
 	#ifdef TAA
-		newJitteredPos = TAAJitter(gl_Position.xy, gl_Position.w);
-		prevJitteredPos = TAAJitterOld(prevNDCPos.xy, prevNDCPos.w);
-		gl_Position.xy = newJitteredPos;
-		newJitteredPos -= gl_Position.xy;
-		prevJitteredPos -= prevNDCPos.xy;
+		vec2 nJitteredPos = TAAJitter(gl_Position.xy, gl_Position.w, false);
+		vec2 pJitteredPos = TAAJitter(prevNDCPos.xy, prevNDCPos.w, true);
+		newJitteredPos = nJitteredPos - gl_Position.xy;
+		prevJitteredPos = pJitteredPos - prevNDCPos.xy;
+		gl_Position.xy = nJitteredPos.xy;
 	#else
-		newJitteredPos = vec2(0.0);
-		prevJitteredPos = vec2(0.0);
+		newJitteredPos = vec2(0);
+		prevJitteredPos = vec2(0);
 	#endif
 }
 
@@ -78,7 +78,7 @@ void main() {
 	color.rgb += emission;
 
 	color *= texture(lightmap, lmcoord);
-	if(color.a < alphaTestRef) {
+	if (color.a < alphaTestRef) {
 		discard;
 	}
 
@@ -93,12 +93,12 @@ void main() {
 
 	vec4 cNDCPos = currNDCPos;
 	vec4 pNDCPos = prevNDCPos;
-	cNDCPos.xy -= newJitteredPos;
-	pNDCPos.xy -= prevJitteredPos;
+
+	cNDCPos.xy += newJitteredPos;// / cNDCPos.w;
+	pNDCPos.xy += prevJitteredPos;// / cNDCPos.w;
 
 	vec2 velocity = calcVelocity(cNDCPos, pNDCPos);
 	velocity = vec2(velocity.x, -velocity.y);
-	
 	motions = vec4(velocity, 0.0, 1.0);
 }
 
