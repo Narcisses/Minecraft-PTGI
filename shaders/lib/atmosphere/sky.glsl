@@ -1,8 +1,8 @@
 vec3 getLightCasterColor() {
 	// Return light color (for clouds)
 	vec3 sunColor = vec3(1.0, 0.9, 0.85) * 1.7;
-	vec3 moonColor = vec3(0.15, 0.16, 0.2) * 1.01;
-	vec3 rainColor = vec3(0.0);
+	vec3 moonColor = vec3(0.07, 0.07, 0.09) * 1.01;
+	vec3 rainColor = vec3(0.1);
 	
 	sunColor = mix(sunColor, rainColor, wetness);
 	moonColor = mix(moonColor, rainColor, wetness);
@@ -49,10 +49,11 @@ vec3 getSkyColor(vec3 rd, bool doMoonStars, bool fast) {
 	vec3 lowerSkyDayColor = vec3(0.5, 0.71, 0.99) * 1.9;
 	vec3 lowerSkyDayMixedColor = mix(lowerSkySunRiseColor, lowerSkyDayColor, middayRatio);
 	vec3 lowerSkyNightColor = vec3(0.0627, 0.0667, 0.0784);
-	vec3 lowerRainSkyColor = vec3(0.16, 0.18, 0.21) * 2.75;
+	vec3 lowerRainSkyColor = vec3(0.56, 0.68, 0.75) * 1.1;
 	lowerSkyDayMixedColor = mix(lowerSkyDayMixedColor, lowerRainSkyColor, wetness);
 	vec3 lowerSkyAmount = mix(lowerSkyNightColor, lowerSkyDayMixedColor, clamp(sunAmount, 0.0, 1.0));
     col = mix(col, 0.85 * lowerSkyAmount, pow(1.0 - max(rd.y, 0.0), 4.0)) * sunAmount;
+	col = mix(col, lowerSkyAmount, wetness);
 
 	// Moon
 	if (doMoonStars) {
@@ -124,6 +125,10 @@ vec3 getSkyColor(vec3 rd, bool doMoonStars, bool fast) {
 
 	if (!fast && hitSphere(sunPos, 8.0, vec3(0.0), rd) && dot(rd, sunDir) > 0)
 		col += sunAmount * sunColor * power * intensity3 * preSunRiseP4 * pow(rainLessLight, 4.0);
+
+	// Remove banding
+	// Implementation from: https://blog.frost.kiwi/GLSL-noise-and-radial-gradient/
+	col += (1.0 / 63.0) * gradientNoise(gl_FragCoord.xy) - (0.5 / 63.0);
 
     return max(vec3(0.0), col);
 }

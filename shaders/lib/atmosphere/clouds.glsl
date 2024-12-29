@@ -1,6 +1,6 @@
 /* Implementation from https://www.shadertoy.com/view/MdGfzh */
-#define CLOUD_MARCH_STEPS 12
-#define CLOUD_SELF_SHADOW_STEPS 4
+#define CLOUD_MARCH_STEPS 18
+#define CLOUD_SELF_SHADOW_STEPS 6
 
 #define EARTH_RADIUS 1500000.0
 #define CLOUDS_BOTTOM 1300.0
@@ -14,17 +14,17 @@
 #define CLOUDS_BOTTOM_SOFTNESS 0.125
 #define CLOUDS_DENSITY_DRY 0.0070
 #define CLOUDS_DENSITY_WET 0.055
-#define CLOUDS_DENSITY_NIGHT_BONUS 0.0001
+#define CLOUDS_DENSITY_NIGHT_BONUS 0.2
 #define CLOUDS_SHADOW_MARGE_STEP_SIZE 15.0
 #define CLOUDS_SHADOW_MARGE_STEP_MULTIPLY 1.3
 #define CLOUDS_FORWARD_SCATTERING_G 0.8
 #define CLOUDS_BACKWARD_SCATTERING_G -0.2
 #define CLOUDS_SCATTERING_LERP 0.5
 
-#define CLOUDS_AMBIENT_COLOR_TOP_DAY vec3(0.9, 0.98, 1.0) * 1.4 // * 0.5
-#define CLOUDS_AMBIENT_COLOR_BOTTOM_DAY vec3(0.75, 0.9, 1.0) * 1.1 // * 0.5
-#define CLOUDS_AMBIENT_COLOR_TOP_NIGHT vec3(0.0039, 0.0196, 0.0353)
-#define CLOUDS_AMBIENT_COLOR_BOTTOM_NIGHT vec3(0.0, 0.0, 0.0)
+#define CLOUDS_AMBIENT_COLOR_TOP_DAY vec3(0.9, 0.98, 1.0) * 1.1 // * 0.5
+#define CLOUDS_AMBIENT_COLOR_BOTTOM_DAY vec3(0.75, 0.9, 1.0) * 1.01 // * 0.5
+#define CLOUDS_AMBIENT_COLOR_TOP_NIGHT vec3(0.0039, 0.0196, 0.0353) / 3.0
+#define CLOUDS_AMBIENT_COLOR_BOTTOM_NIGHT vec3(0.0039, 0.0196, 0.0353) / 3.0
 #define CLOUDS_MIN_TRANSMITTANCE_DAY 0.01
 #define CLOUDS_MIN_TRANSMITTANCE_NIGHT 0.99
 
@@ -107,7 +107,7 @@ float cloudMap(vec3 pos, vec3 rd, float norY) {
 
     float cloudsCoverage = mix(CLOUDS_COVERAGE_DRY, CLOUDS_COVERAGE_WET, wetness);
     float cloudsDensity = mix(CLOUDS_DENSITY_DRY, CLOUDS_DENSITY_WET, wetness);
-    float amountNight = mix(0.0, CLOUDS_DENSITY_NIGHT_BONUS, getNightAmount());
+    float amountNight = mix(0.0, CLOUDS_DENSITY_NIGHT_BONUS, getNightAmount2());
     cloudsDensity += amountNight;
 
     m = smoothstep(0., CLOUDS_BASE_EDGE_SOFTNESS, m + (cloudsCoverage - 1.));
@@ -141,6 +141,9 @@ float volumetricShadow(in vec3 from, in float sundotrd) {
 
 vec4 renderClouds(vec3 ro, vec3 rd, inout float dist) {
     ro.y = sqrt(EARTH_RADIUS * EARTH_RADIUS - dot(ro.xz, ro.xz));
+
+    vec3 rnd = worldTime * rd;
+    rd = normalize(rd + 0.02 * hash33(rnd));
 
     float start = interectCloudSphere(rd, CLOUDS_BOTTOM);
     float end = interectCloudSphere(rd, CLOUDS_TOP);
@@ -188,13 +191,16 @@ vec4 renderClouds(vec3 ro, vec3 rd, inout float dist) {
             transmittance *= dTrans;
         }
 
-        float cloudsMinTransmittance = CLOUDS_MIN_TRANSMITTANCE_DAY;
+        float cloudsMinTransmittance = mix(CLOUDS_MIN_TRANSMITTANCE_NIGHT, CLOUDS_MIN_TRANSMITTANCE_DAY, getSunRiseSetPercentage());
         //mix(CLOUDS_MIN_TRANSMITTANCE_NIGHT, CLOUDS_MIN_TRANSMITTANCE_DAY, getSunRiseSetPercentage2());
         if (transmittance <= cloudsMinTransmittance)
             break;
 
         d += dD;
     }
+
+    // Remove banding issues
+    scatteredLight += (1.0 / 63.0) * gradientNoise(gl_FragCoord.xy) - (0.5 / 63.0);
 
     return vec4(scatteredLight, transmittance);
 }

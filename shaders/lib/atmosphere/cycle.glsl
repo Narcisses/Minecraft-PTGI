@@ -222,8 +222,17 @@ float getNightAmount2() {
 float getFogAmount() {
     // Lots of fog when sunset to hide sky-clouds border
 	// In order to make beautiful blending
+	float fogAmount = mix(1.0, 0.35, getSunAmount());
+	fogAmount += mix(0.0, 0.25, wetness);
+	fogAmount = clamp(fogAmount, 0.0, 1.0);
 
-	return 0.6;
+	return fogAmount;
+}
+
+float getCloudRayStrayAmount() {
+	float strayAmount = mix(0.25, 0.0075, getSunAmount()) * mix(1.0, 4.1, wetness);
+
+	return strayAmount;
 }
 
 float getBloomAlphaAmount() {

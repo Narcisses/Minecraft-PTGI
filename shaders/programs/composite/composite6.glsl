@@ -145,8 +145,8 @@ vec4 pathTrace() {
 	#endif
 	float seed = uv.x + uv.y * 3.43121412313 + fract(1.12345314312 * time);
 
-	int halfResNbSamples = isGameAtHalfResolution() ? 4 : 0;
-	int midResNbSamples = isGameAtMidResolution() ? 2 : 0;
+	int halfResNbSamples = isGameAtHalfResolution() ? 6 : 0;
+	int midResNbSamples = isGameAtMidResolution() ? 4 : 0;
 	int nbSamples = NB_SAMPLES + halfResNbSamples + midResNbSamples;
 
 	for (int j = 0; j < nbSamples; j++) {

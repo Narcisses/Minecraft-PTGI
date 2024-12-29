@@ -3,6 +3,7 @@
 #include "/lib/settings/buffers.glsl"
 #include "/lib/common/screen.glsl"
 #include "/lib/common/easing.glsl"
+#include "/lib/common/rand.glsl"
 #include "/lib/common/encoding.glsl"
 #include "/lib/atmosphere/cycle.glsl"
 #include "/lib/atmosphere/moonstars.glsl"

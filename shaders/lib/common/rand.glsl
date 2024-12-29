@@ -1,3 +1,8 @@
+float gradientNoise(in vec2 uv) {
+    // For banding issues
+	return fract(52.9829189 * fract(dot(uv, vec2(0.06711056, 0.00583715))));
+}
+
 float rand(vec2 co) {
     float a = 12.9898;
     float b = 78.233;
