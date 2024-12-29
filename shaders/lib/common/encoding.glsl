@@ -23,9 +23,13 @@ vec3 decodeNormal(vec3 normal) {
 }
 
 float encodeID(float ID) {
+    ID = max(0, ID - 9999);
+    ID /= 1100.0;
     return ID;
 }
 
 float decodeID(float ID) {
-    return ID;
+    ID = ID + 9999;
+    ID *= 1100.0;
+    return float(round(ID));
 }

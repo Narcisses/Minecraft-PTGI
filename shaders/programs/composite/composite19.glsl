@@ -1,6 +1,8 @@
 #include "/lib/settings/settings.glsl"
 #include "/lib/settings/uniforms.glsl"
 #include "/lib/settings/buffers.glsl"
+#include "/lib/common/screen.glsl"
+#include "/lib/common/reprojection.glsl"
 #include "/lib/antialiasing/taa.glsl"
 
 #ifdef VSH
@@ -28,7 +30,7 @@ void main() {
 
 	#ifdef TAA
 		vec3 color = texture2DLod(colortex14, texcoord, 0.0).rgb;
-		vec4 prev = TemporalAA(texcoord, color, 0.0);
+		vec4 prev = temporalAA(texcoord, color, 0.0);
 
 		currFrame = vec4(color, 1.0);
 		pastFrame = vec4(prev);

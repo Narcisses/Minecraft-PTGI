@@ -1,7 +1,7 @@
 #define textureLod0Offset(img, coord, offset) textureLodOffset(img, coord, 0.0f, offset)
 #define textureLod0(img, coord) textureLod(img, coord, 0.0f)
 
-void SharpenFilter(inout vec3 color, vec2 textureCoord) {
+void sharpenFilter(inout vec3 color, vec2 textureCoord) {
     // fetch a 3x3 neighborhood around the pixel 'e',
     //  a b c
     //  d(e)f

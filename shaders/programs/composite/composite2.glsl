@@ -6,11 +6,11 @@
 #include "/lib/common/rand.glsl"
 #include "/lib/common/encoding.glsl"
 #include "/lib/common/texture.glsl"
+#include "/lib/common/reprojection.glsl"
+#include "/lib/geom/geom.glsl"
 #include "/lib/atmosphere/cloudnoise.glsl"
 #include "/lib/atmosphere/cycle.glsl"
 #include "/lib/atmosphere/moonstars.glsl"
-#include "/lib/atmosphere/ray.glsl"
-#include "/lib/geom/geom.glsl"
 #include "/lib/atmosphere/sky.glsl"
 #include "/lib/atmosphere/clouds.glsl"
 

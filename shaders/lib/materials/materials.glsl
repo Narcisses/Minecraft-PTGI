@@ -19,9 +19,7 @@ vec3 getEmission(float blockID, vec3 color) {
     if (isEmitter(int(blockID + 0.5))) {
 		emission = color.rgb * DIRECT_EMISSION;
 	}
-    float b = getMaxBrightness();
-    float s = 1.0 - getSunAmount();
-    return emission * b * s;
+    return emission;
 }
 
 vec3 getRayTracedEmission(float blockID) {

@@ -2,8 +2,6 @@
 #include "/lib/settings/uniforms.glsl"
 #include "/lib/settings/buffers.glsl"
 #include "/lib/common/encoding.glsl"
-#include "/lib/atmosphere/cycle.glsl"
-#include "/lib/grading/colors.glsl"
 #include "/lib/materials/materials.glsl"
 #include "/lib/tracing/voxelization.glsl"
 
@@ -44,8 +42,7 @@ out vec4 colorOut;
 flat out float blockIDOut;
 
 bool isVoxelizable(int blockID) {
-    // return !(blockID < 10000 || (blockID >= 12000 && blockID < 13000) || (blockID >= 15000 && blockID < 15500));
-    return blockID < 12000 && blockID > 10000;
+    return blockID < 10500 && blockID >= 10000;
 }
 
 void main() {

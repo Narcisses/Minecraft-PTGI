@@ -2,7 +2,6 @@
 #include "/lib/settings/uniforms.glsl"
 #include "/lib/settings/buffers.glsl"
 #include "/lib/common/screen.glsl"
-#include "/lib/common/easing.glsl"
 #include "/lib/atmosphere/cloudnoise.glsl"
 
 #ifdef VSH

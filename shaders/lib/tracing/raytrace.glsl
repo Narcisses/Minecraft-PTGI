@@ -19,9 +19,7 @@ RayHit voxelTrace(vec3 origin, vec3 direction) {
 
     vec3 sideDist = (sign(direction) * (vec3(mapPos) - origin) + (sign(direction) * 0.5) + 0.5) * deltaDist;
     bvec3 mask;
-
-    vec3 residualEmission = vec3(0.0);
-
+    
     for (int s = 0; s < MAX_STEP; s++) {
         if (s != 0) {
             vec3 centeredVoxel = mapPos + vec3(VOXEL_SIZE / 2.0f);
@@ -31,14 +29,9 @@ RayHit voxelTrace(vec3 origin, vec3 direction) {
                 if (texelFetch(shadow, ivec2(samplePoint * shadowMapResolution), 0).r < 0.8f) {
                     vec4 sampleColour = texelFetch(shadowcolor0, ivec2(samplePoint * shadowMapResolution), 0);
                     vec4 data = texelFetch(shadowcolor1, ivec2(samplePoint * shadowMapResolution), 0);
-
-                    // if (isEmitter(int(decodeID(data.a + 0.5))) || decodeID(data.a) >= 16000) {
-                    //     residualEmission = getRayTracedEmission(decodeID(data.a));
-                    // } else {
-                        vec3 emission = getRayTracedEmission(decodeID(data.a)) + residualEmission;
-                        float dist = length(vec3(mask) * (sideDist - deltaDist)) / length(direction);
-                        return RayHit(true, sampleColour, emission, (origin + direction * dist) - cameraOffset, vec3(mask) * -sign(direction), int(data.a));
-                    // }
+                    vec3 emission = getRayTracedEmission(decodeID(data.a));
+                    float dist = length(vec3(mask) * (sideDist - deltaDist)) / length(direction);
+                    return RayHit(true, sampleColour, emission, (origin + direction * dist) - cameraOffset, vec3(mask) * -sign(direction), int(data.a));
                 }
             } else {
                 break;

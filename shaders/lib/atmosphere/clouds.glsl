@@ -143,18 +143,20 @@ vec4 renderClouds(vec3 ro, vec3 rd, inout float dist) {
     ro.y = sqrt(EARTH_RADIUS * EARTH_RADIUS - dot(ro.xz, ro.xz));
 
     vec3 rnd = worldTime * rd;
-    rd = normalize(rd + 0.02 * hash33(rnd));
+    float sunAmount = getSunAmount();
+    vec3 sunDir = getSunDir();
+
+    float amountDistort = mix(0.02, 0.01, sunAmount);
+    rd = normalize(rd + amountDistort * hash33(rnd));
 
     float start = interectCloudSphere(rd, CLOUDS_BOTTOM);
     float end = interectCloudSphere(rd, CLOUDS_TOP);
 
-    vec3 light_color = getLightCasterColor(); //getSkyColor(rd, false, false); //
-    float sunAmount = getSunAmount();
+    vec3 light_color = getLightCasterColor();
     float cloudClearColorAmount = max(0.0, sunAmount - wetness * 0.5);
 
     end = min(end, dist);
 
-    vec3 sunDir = getSunDir();
     float sundotrd = dot(rd, -sunDir);
 
     // raymarch
@@ -192,7 +194,7 @@ vec4 renderClouds(vec3 ro, vec3 rd, inout float dist) {
         }
 
         float cloudsMinTransmittance = mix(CLOUDS_MIN_TRANSMITTANCE_NIGHT, CLOUDS_MIN_TRANSMITTANCE_DAY, getSunRiseSetPercentage());
-        //mix(CLOUDS_MIN_TRANSMITTANCE_NIGHT, CLOUDS_MIN_TRANSMITTANCE_DAY, getSunRiseSetPercentage2());
+        
         if (transmittance <= cloudsMinTransmittance)
             break;
 

@@ -50,6 +50,7 @@ This repository presents a shaderpack for Minecraft 1.21 with Iris that implemen
 - Day/night cycle
 - Bloom
 - Weather and raining
+- Animated vegetation
 - Color grading
 - Tonemapping
 - Gamma correction

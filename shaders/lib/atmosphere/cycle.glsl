@@ -1,3 +1,8 @@
+/*
+	Every function in this file is concerned with computing 
+	a factor given the time of day mostly to it can then be used 
+	as a smoothing variable for different purposes.
+*/
 float getSunAmount() {
 	float sunsetStart = 12000.;
 	float sunsetEnd = 13000.;

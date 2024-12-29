@@ -9,7 +9,7 @@
 // Filtering
 #define HISTORY_SAMPLE_COUNT 60 // Maximum number of accumulated samples (SVGF) (24, 48, 60, 90)
 #define PHI_COLOUR 10.0
-#define PHI_NORMAL 128.0
+#define PHI_NORMAL 32.0
 
 // Pipeline
 #define RAYTRACE
@@ -34,7 +34,7 @@
 #define MAX_EXPOSURE 2.0    // Maximum exposure (impacts brightness)
 
 // Emission
-#define EMISSION 24.0        // Emission power of bright blocks (glowstone, ...) 96.0
+#define EMISSION 24.0        // Emission power of bright blocks (glowstone, ...)
 #define DIRECT_EMISSION 6.5 // Emission power of bright blocks (glowstone, ...)
 
 // Moon
@@ -42,3 +42,7 @@
 
 // TAA
 #define CAS_AMOUNT 0.01      // Sharpening amount for CAS. (0.1 to 1.0)
+
+// Motion Blur
+#define MOTION_BLUR_STRENGTH 0.40
+#define MOTION_BLUR_SAMPLES 6

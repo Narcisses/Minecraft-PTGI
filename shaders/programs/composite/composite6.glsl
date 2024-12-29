@@ -6,9 +6,9 @@
 #include "/lib/common/easing.glsl"
 #include "/lib/common/texture.glsl"
 #include "/lib/common/rand.glsl"
+#include "/lib/common/constants.glsl"
 #include "/lib/atmosphere/cycle.glsl"
 #include "/lib/atmosphere/moonstars.glsl"
-#include "/lib/atmosphere/ray.glsl"
 #include "/lib/geom/geom.glsl"
 #include "/lib/atmosphere/sky.glsl"
 #include "/lib/atmosphere/clouds.glsl"
@@ -16,7 +16,7 @@
 #include "/lib/materials/materials.glsl"
 #include "/lib/tracing/voxelization.glsl"
 #include "/lib/tracing/raytrace.glsl"
-#include "/lib/tracing/BRDF.glsl"
+#include "/lib/tracing/brdf.glsl"
 
 #ifdef VSH
 
@@ -41,7 +41,7 @@ float getEpsilon(float blockID) {
 	if (int(blockID + 0.5) == 10429) {
 		return 0.1;
 	}
-	return 0.01;
+	return 0.1;
 }
 
 RayHit getPrimaryRay(vec2 uv) {
@@ -68,26 +68,28 @@ vec3 sampleLight(inout float seed, float radius) {
 }
 
 vec3 directLighting(inout float seed, int i, vec3 position, vec3 normal, vec3 color) {
-	float radius = 15;
 	vec3 outColor;
 
-	// Direct light sampling
-	vec3 ld = sampleLight(seed, radius) - position;
-	vec3 nld = normalize(ld);
-	RayHit lightHit = voxelTrace(position, nld);
+	if (i < NB_BOUNCES - 1) {
+		// Direct light sampling
+		float radius = 15;
+		vec3 ld = sampleLight(seed, radius) - position;
+		vec3 nld = normalize(ld);
+		RayHit lightHit = voxelTrace(position, nld);
 
-	if (!lightHit.hit && i < NB_BOUNCES - 1) {
-		vec3 sunPos = getSunPosition();
-		float cos_a_max = sqrt(1. - clamp(radius * radius / dot(sunPos.xyz - position, sunPos.xyz - position), 0., 1.));
-		float weight = 2. * (1. - cos_a_max);
-		outColor += (color * getSkyColor(nld, true, true)) * (weight * clamp(dot(nld, normal), 0., 1.)) / (2.0 * 3.14);
+		if (!lightHit.hit) {
+			vec3 sunPos = getSunPosition();
+			float cos_a_max = sqrt(1. - clamp(radius * radius / dot(sunPos.xyz - position, sunPos.xyz - position), 0., 1.));
+			float weight = 2. * (1. - cos_a_max);
+			outColor += (color * getSkyColor(nld, true, true)) * (weight * clamp(dot(nld, normal), 0., 1.)) / TWO_TIMES_PI;
+		}
 	}
 
 	return outColor;
 }
 
 float getLightFalloffDistanceFromCenter(RayHit hit) {
-	// Decrease factor as fragment goes outside block
+	// Decrease factor as fragment goes outside block (toward block edge)
 	vec3 withinVoxel = hit.position + fract(cameraPosition) - hit.normal * 0.1;
 	vec3 roundedVoxel = floor(withinVoxel) + vec3(0.5);
 	float d = distance(hit.position + fract(cameraPosition), roundedVoxel);
@@ -100,7 +102,7 @@ float getLightFalloffDistanceFromCenter(RayHit hit) {
 
 float computeAmbientLight(vec2 uv) {
 	// Day / night
-	float dayAmbient = 0.030;
+	float dayAmbient = 0.040;
 	float nightAmbient = 0.005;
 	
 	// Inside / outside
@@ -123,13 +125,8 @@ float computeAmbientLight(vec2 uv) {
 	}
 	float ambientAtSide = mix(minAmbientLightAtSide, maxAmbientLightAtSide, x);
 
-	// Faraway light
-	float minFaraway = 1.0;
-	float maxFaraway = 1.5;
-	float farawayAmbientLight = mix(minFaraway, maxFaraway, linearDepth(texture(depthtex0, uv).r));
-
 	// Ambient light
-	float ambientLight = timeOfDayAmbientLight * brightnessAmbientLight * max(1.0, ambientAtSide);//+ farawayAmbientLight;
+	float ambientLight = timeOfDayAmbientLight * brightnessAmbientLight * max(1.0, ambientAtSide);
 
 	return ambientLight;
 }
@@ -176,18 +173,18 @@ vec4 pathTrace() {
 			normal = hit.normal;
 			epsilon = getEpsilon(float(hit.blockID));
 			position = hit.position + normal * epsilon;
-			rd = BRDF(normal, seed, pdf);
+			rd = brdf(normal, seed, pdf);
 
 			if (hit.hit) {
 				// We hit the terrain
 				if (isEmitter(int(hit.blockID + 0.5))) {
 					// Block hit emits light
 					float d = getLightFalloffDistanceFromCenter(hit);
-					outColor += (hit.color.rgb / (2.0 * 3.14)) * getRayTracedEmission(hit.blockID) * d;
+					outColor += (hit.color.rgb / TWO_OVER_PI) * getRayTracedEmission(hit.blockID) * d;
 					break;
 				} else {
 					// Block diffuse
-					color *= (hit.color.rgb / (2.0 * 3.14)) * max(1e-7, abs(dot(normal, rd)) / pdf);
+					color *= (hit.color.rgb / TWO_OVER_PI) * max(1e-7, abs(dot(normal, rd)) / pdf);
 				}
 			} else {
 				// We missed the terrain, so we hit the sky

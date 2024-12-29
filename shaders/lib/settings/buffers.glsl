@@ -47,20 +47,20 @@ layout(std430, binding = 0) buffer SSBOScreenSizeData {
 
 // ------------- Buffers Formats -------------
 /*
-const int shadowcolor1Format = RGBA32F;
+const int shadowcolor1Format = RGBA;
 const int colortex0Format = RGBA16F;
 const int colortex1Format = RGBA16F;
-const int colortex2Format = RGBA32F;
-const int colortex3Format = RGBA32F;
+const int colortex2Format = RGBA;
+const int colortex3Format = RGBA16F;
 const int colortex4Format = RGBA16F;
 const int colortex5Format = RGBA16F;
-const int colortex6Format = RGBA32F;
-const int colortex7Format = RGBA32F;
+const int colortex6Format = RGBA;
+const int colortex7Format = RGBA;
 const int colortex8Format = RGBA16F;
 const int colortex9Format = RGBA;
 const int colortex10Format = RGBA16F;
 const int colortex11Format = RGBA16F;
-const int colortex12Format = RGBA32F;
+const int colortex12Format = RGBA16F;
 const int colortex13Format = RGBA16F;
 const int colortex14Format = RGBA16F;
 const int colortex15Format = RGBA16F;

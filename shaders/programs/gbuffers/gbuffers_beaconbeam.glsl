@@ -2,7 +2,7 @@
 #include "/lib/settings/uniforms.glsl"
 #include "/lib/settings/buffers.glsl"
 #include "/lib/common/encoding.glsl"
-#include "/lib/common/motion.glsl"
+#include "/lib/common/reprojection.glsl"
 #include "/lib/antialiasing/jitter.glsl"
 
 #ifdef VSH

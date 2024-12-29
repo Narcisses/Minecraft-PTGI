@@ -1,6 +1,4 @@
 const float DEPTH_THRESHOLD = 0.66;
-#define MOTION_BLUR_STRENGTH 0.40
-#define MOTION_BLUR_SAMPLES 6
 
 vec3 motionBlur(sampler2D tex, vec2 texcoord, vec3 color, float z, float dither) {
     if (z <= DEPTH_THRESHOLD) return color;

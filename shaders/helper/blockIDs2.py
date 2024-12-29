@@ -8824,6 +8824,11 @@ page = '''<tbody>
 <td style="text-align: left;">soul_wall_torch</td>
 <td style="text-align: left;"></td>
 </tr>
+<tr>
+<td style="text-align: left;">3</td>
+<td style="text-align: left;">coarse_dirt</td>
+<td style="text-align: left;"></td>
+</tr>
 </tbody>'''
 
 import re
@@ -8854,11 +8859,11 @@ voxelizable_id = 10000
 voxelizable = []
 voxelizable_re = '(wood|block|dirt|podzol|sand|leaves|planks|cobblestone|mossy|bricks|granite|stone|gravel|terracotta|stripped|wool|diorite|andesite|nylium|hay|beehive|bee_nest|table|tnt|log|mycelium|netherrack|obsidian|bedrock|ore|basalt|soul_soil|shroomlight|lodestone|target|sponge|shulker|composter|loom|barrel|smoker|end_portal_frame|dirt_path|grass_path|end_gateway|dispenser|dropper|observer|furnace|jukebox|concrete|cactus|pumpkin|lantern|piston|bookshelf|cauldron|pillar|spawner|chest|farmland|ice|snow|clay|stem|redstone_lamp|glowstone|beacon)'
 
-non_voxelizable_with_lighting_id = 15000
+non_voxelizable_with_lighting_id = 10500
 non_voxelizable_with_lighting = []
 non_voxelizable_with_lighting_re = '(door|trapdoor|stairs|slab|pressure_plate|armor_stand|wall|fence|gate|anvil|campfire|tutle_egg|lectern|grindstone|stonecutter|bell|torch|head|skull|cocoa|vine|dragon_egg|button|detector|hopper|rail|carpet|repeater|comparator|bars|bed|scaffolding|flower_pot|amethyst_cluster|cobweb|azalea|sign|minecart|boat|potted|banner|roots)'
 
-translucent_id = 16000
+translucent_id = 11030
 translucent = []
 translucent_re = 'glass'
 

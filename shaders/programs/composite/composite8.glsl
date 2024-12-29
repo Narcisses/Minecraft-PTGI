@@ -5,13 +5,10 @@
 #include "/lib/common/screen.glsl"
 #include "/lib/common/easing.glsl"
 #include "/lib/common/texture.glsl"
-#include "/lib/common/vmath.glsl"
-#include "/lib/atmosphere/ray.glsl"
 #include "/lib/atmosphere/cycle.glsl"
 #include "/lib/grading/colors.glsl"
 #include "/lib/materials/materials.glsl"
 #include "/lib/filtering/svgf.glsl"
-#include "/lib/antialiasing/jitter.glsl"
 
 #ifdef VSH
 
@@ -44,7 +41,6 @@ void temporalFilter() {
     // Current sample (this frame)
     vec3 currColor = texture(colortex4, texcoord).rgb;
     vec3 currPos = texture(colortex1, texcoord).rgb;
-    float currDepth = texture(depthtex0, texcoord).r;
     vec4 normalAndID = texture(gnormal, texcoord);
     vec3 currNormal = decodeNormal(normalAndID.xyz);
     float currID = decodeID(normalAndID.a);
@@ -94,18 +90,11 @@ void temporalFilter() {
         vec4 nNID = texelFetch(colortex7, ivec2(oldUV * iresolution), 0);
         histNormal = decodeNormal(nNID.rgb);
         histID = decodeID(nNID.a);
-        histDepth = momentsHist.b;
 
-        if (isFragmentValid(oldUV, currNormal, currID, histNormal, currDepth, histDepth, histID, currPos, histPosition)) {
+        if (isFragmentValid(oldUV, currNormal, currID, histNormal, histID, currPos, histPosition)) {
+            couldLoad = true;
             break;
         }
-    }
-
-    // If valid, then reuse data
-    if (isFragmentValid(oldUV, currNormal, currID, histNormal, currDepth, histDepth, histID, currPos, histPosition)) {
-        newSampleCount = min(HISTORY_SAMPLE_COUNT, historyAcc + 1);
-        alpha = 1.0 / newSampleCount;
-        couldLoad = true;
     }
 
     // If could not load, then restart accumulation process
@@ -114,6 +103,10 @@ void temporalFilter() {
         histMoments = vec2(0.0);
         newSampleCount = 1.0;
         alpha = 1.0;
+    } else {
+        // If valid fragment, then reuse data
+        newSampleCount = min(HISTORY_SAMPLE_COUNT, historyAcc + 1);
+        alpha = 1.0 / newSampleCount;
     }
 
     // Compute moments & variance
@@ -131,7 +124,8 @@ void temporalFilter() {
     accMoments = vec4(moments, newSampleCount, 1.0);
 }
 
-void pass(vec2 texcoord) {
+void passThru(vec2 texcoord) {
+    // Pure pass-through, just copy the data and move on to next pass
     vec3 currColor = texture(colortex4, texcoord).rgb;
     vec2 moments = computeMoments(currColor);
     float variance = max(0.0, moments.g - moments.r * moments.r);
@@ -148,7 +142,7 @@ void main() {
         #ifdef TEMPORAL_ACCUMULATION
             temporalFilter();
         #else
-            pass(texcoord);
+            passThru(texcoord);
         #endif
     }
 }

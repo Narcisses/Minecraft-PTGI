@@ -42,38 +42,3 @@ vec3 bilateralBlur(sampler2D tex, vec2 uv) {
 
     return max(vec3(0.0), final_colour / Z);
 }
-
-// #define HW 5
-// #define sigmaSpace 15.0
-// #define sigmaColor 25.0
-
-// vec3 bilateralBlur(sampler2D tex, vec2 uv) {
-//     vec4 I = texture(tex, uv);
-//     if (isWithinTexture(uv) && isTerrain(uv)) {
-//         // Bilateral Filter
-//         // Caluclate the 2*sigma^2 of both
-//         float Ss = pow(sigmaSpace, 2.0) * 2.0;
-//         float Sc = pow(sigmaColor, 2.0) * 2.0;
-
-//         highp vec4 TW = vec4(0.0); // Sum of Weights
-//         highp vec4 WI = vec4(0.0); // Sum of Weighted Intensities
-//         highp vec4 w;
-        
-//         for (int i = -HW; i <= HW; i++) {
-//             for (int j = -HW; j <= HW; j++) {
-//                 vec2 dx = vec2(float(i), float(j));
-//                 vec2 tc = uv + dx / iresolution.xy;
-//                 if (isWithinTexture(tc) && isTerrain(tc)) {
-//                     vec4 Iw = texture(tex, tc);
-//                     vec4 dc = (I - Iw) * 255.0;
-
-//                     w = exp(-dot(dx, dx) / Ss - dc * dc / Sc);
-//                     TW += w;
-//                     WI += Iw * w;
-//                 }
-//             }
-//         }
-
-//         return max(vec3(0.0), (WI / TW).rgb);
-//     }
-// }
