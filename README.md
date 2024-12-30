@@ -87,9 +87,13 @@ I would also like to thank [coolq1000](https://github.com/coolq1000) without who
 
 ### Code
 - [Clouds](https://www.shadertoy.com/view/MdGfzh)
-- [SVGF](https://research.nvidia.com/publication/2017-07_spatiotemporal-variance-guided-filtering-real-time-reconstruction-path-traced) 
+- [SVGF](https://research.nvidia.com/publication/2017-07_spatiotemporal-variance-guided-filtering-real-time-reconstruction-path-traced)
 - [Voxelization](https://github.com/coolq1000/vx-simple) 
 - [Bloom](https://www.shadertoy.com/view/lsBfRc)
+- [TAA](https://modrinth.com/shader/taa)
+- [TAA](https://modrinth.com/shader/vanillaa)
+- [Motion Blur](https://modrinth.com/shader/motion-blur-fx)
+- [Waving Plants](https://www.9minecraft.net/waving-plants-shaders-mod/)
 
 ### Maps
 - [Epic Medieval Town](https://www.9minecraft.net/epic-medieval-town-map/#Epic_Medieval_Town_Map_1214_1201_Download_Links)
