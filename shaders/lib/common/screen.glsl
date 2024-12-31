@@ -9,6 +9,13 @@ bool hasResolutionChanged() {
     return (abs(viewWidth - oldSize.x) > epsilon) || (abs(viewHeight - oldSize.y) > epsilon);
 }
 
+bool hasTimeChanged() {
+    float epsilon = 100.0;
+    float prevWorldTime = screenData.worldtime;
+
+    return abs(prevWorldTime - worldTime) >= epsilon;
+}
+
 bool isGameAtHalfResolution() {
     return viewWidth <= 1920.0 / 2.0;
 }

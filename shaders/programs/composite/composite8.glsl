@@ -98,7 +98,7 @@ void temporalFilter() {
     }
 
     // If could not load, then restart accumulation process
-    if (!couldLoad || isFirstFrame()) {
+    if (!couldLoad || isFirstFrame() || hasTimeChanged()) {
         histIllumination = vec3(0.0);
         histMoments = vec2(0.0);
         newSampleCount = 1.0;
